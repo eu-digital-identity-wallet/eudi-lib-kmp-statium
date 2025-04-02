@@ -213,18 +213,12 @@ sonarqube {
     properties {
         val report = "${project.layout.buildDirectory.asFile.get().absolutePath}/reports/kover/report.xml"
         property("sonar.coverage.jacoco.xmlReportPaths", report)
+        property("sonar.kotlin.module.path", "")
     }
 }
 
 tasks.sonar {
     dependsOn(tasks.koverXmlReport)
-}
-
-sonar {
-    properties {
-        val report = "${project.layout.buildDirectory.asFile.get().absolutePath}/reports/kover/report.xml"
-        property("sonar.coverage.jacoco.xmlReportPaths", report)
-    }
 }
 
 tasks.withType<DokkaTask>().configureEach {
