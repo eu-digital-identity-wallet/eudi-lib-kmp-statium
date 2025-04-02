@@ -119,16 +119,6 @@ kotlin {
             }
         }
 
-        jvmMain {
-            dependencies {
-                implementation(libs.ktor.client.java)
-            }
-        }
-
-        jvmTest {
-            dependencies { }
-        }
-
         @Suppress("unused")
         val jvmAndAndroidMain by getting {
             dependencies { }
@@ -136,6 +126,16 @@ kotlin {
 
         @Suppress("unused")
         val jvmAndAndroidTest by getting {
+            dependencies { }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(libs.ktor.client.java)
+            }
+        }
+
+        jvmTest {
             dependencies { }
         }
 
@@ -232,9 +232,6 @@ tasks.withType<DokkaTask>().configureEach {
             // used as project name in the header
             moduleName.set(properties["POM_NAME"].toString())
             moduleVersion.set(project.version.toString())
-
-            // contains descriptions for the module and the packages
-            // includes.from("Module.md")
 
             documentedVisibilities.set(
                 setOf(
