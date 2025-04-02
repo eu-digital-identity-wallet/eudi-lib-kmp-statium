@@ -115,9 +115,7 @@ class ByteArrayAsBase64UrlNoPaddingSerializerTest {
         data class TestData(val data: ByteArrayAsBase64UrlNoPadding) {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (javaClass != other?.javaClass) return false
-
-                other as TestData
+                if (other !is TestData) return false
 
                 if (!data.contentEquals(other.data)) return false
 
@@ -125,7 +123,7 @@ class ByteArrayAsBase64UrlNoPaddingSerializerTest {
             }
 
             override fun hashCode(): Int {
-                return data.contentHashCode()
+                return data.fold(0) { acc, byte -> 31 * acc + byte.toInt() }
             }
         }
 
