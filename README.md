@@ -23,7 +23,35 @@ effectively enabling applications to verify if tokens are valid, revoked, or in 
 
 ## Installation
 
-TBD
+To include the Statium library in your project, add the following dependency:
+
+### Kotlin Multiplatform Project
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("eu.europa.ec.eudi:eudi-lib-kmp-statium:$statium_ver")
+}
+```
+
+### Java Project
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("eu.europa.ec.eudi:eudi-lib-kmp-statium-jvm:$statium_ver")
+}
+```
+
+### Android Project
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("eu.europa.ec.eudi:eudi-lib-kmp-statium-android:$statium_ver")
+}
+```
+
 
 
 ## Use cases supported
