@@ -125,9 +125,7 @@ public data class StatusList(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as StatusList
+        if (other !is StatusList) return false
 
         if (bytesPerStatus != other.bytesPerStatus) return false
         if (!compressedList.contentEquals(other.compressedList)) return false
@@ -138,7 +136,7 @@ public data class StatusList(
 
     override fun hashCode(): Int {
         var result = bytesPerStatus.hashCode()
-        result = 31 * result + compressedList.contentHashCode()
+        result = 31 * result + compressedList.fold(0) { acc, byte -> 31 * acc + byte.toInt() }
         result = 31 * result + (aggregationUri?.hashCode() ?: 0)
         return result
     }

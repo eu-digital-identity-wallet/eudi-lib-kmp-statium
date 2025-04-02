@@ -17,6 +17,9 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.JvmAndroidDecompress
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
+
+internal actual fun platformIoContext(): CoroutineContext = Dispatchers.IO
 
 internal actual fun platformDecompress(context: CoroutineContext): Decompress = JvmAndroidDecompress(context)

@@ -16,7 +16,7 @@
 package eu.europa.ec.eudi.statium
 
 import io.ktor.client.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -26,8 +26,9 @@ import kotlin.test.assertEquals
 
 class GetStatusTest {
 
-    @Test @Ignore
-    fun testGetTokenStatusList() = runTest {
+    @Test
+    @Ignore
+    fun testGetTokenStatusList() =
         doTest(
             expectedStatus = Status.Valid,
             statusReference = StatusReference(
@@ -36,23 +37,22 @@ class GetStatusTest {
             ),
             Clock.fixed(Instant.parse("2025-03-27T13:02:23Z")),
         )
-    }
 }
 
 fun Clock.Companion.fixed(at: Instant): Clock = object : Clock {
     override fun now(): Instant = at
 }
 
-private suspend fun doTest(expectedStatus: Status, statusReference: StatusReference, clock: Clock = Clock.System) {
+private fun doTest(expectedStatus: Status, statusReference: StatusReference, clock: Clock = Clock.System) = runTest {
     with(getStatus(clock) { HttpClient() }) {
         val status = statusReference.status(at = null).getOrThrow()
         assertEquals(expectedStatus, status)
     }
 }
 
-private fun getStatus(clock: Clock, httpClientFactory: () -> HttpClient): GetStatus {
+private fun CoroutineScope.getStatus(clock: Clock, httpClientFactory: () -> HttpClient): GetStatus {
     val verifySignature = VerifyStatusListTokenSignature.Ignore
     val getStatusListToken = GetStatusListToken.usingJwt(clock, httpClientFactory, verifySignature)
-    val decompress = platformDecompress(Dispatchers.IO)
+    val decompress = platformDecompress(coroutineContext)
     return GetStatus(getStatusListToken, decompress)
 }

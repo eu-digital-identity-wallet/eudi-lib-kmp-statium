@@ -16,7 +16,19 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
-import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-internal expect fun platformDecompress(context: CoroutineContext = Dispatchers.IO): Decompress
+/**
+ * Returns a platform-specific CoroutineContext suitable for IO operations
+ */
+internal expect fun platformIoContext(): CoroutineContext
+
+/**
+ * Creates a platform-specific Decompress implementation
+ */
+internal expect fun platformDecompress(context: CoroutineContext): Decompress
+
+/**
+ * Creates a platform-specific Decompress implementation with the default IO context
+ */
+internal fun platformDecompress(): Decompress = platformDecompress(platformIoContext())
