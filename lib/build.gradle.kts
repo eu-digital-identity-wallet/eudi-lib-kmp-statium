@@ -200,6 +200,7 @@ mavenPublishing {
     }
 }
 
+// Needed for compatibility with sonar.yml action
 tasks.register("jacocoTestReport") {
     dependsOn(tasks.koverXmlReport)
 }
