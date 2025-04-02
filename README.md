@@ -1,4 +1,4 @@
-# EUDI SD-JWT
+# Statium
 
 :heavy_exclamation_mark: **Important!** Before you proceed, please read
 the [EUDI Wallet Reference Implementation project description](https://github.com/eu-digital-identity-wallet/.github/blob/main/profile/reference-implementation.md)
@@ -117,8 +117,8 @@ when (status) {
     Status.Valid -> println("Token is valid")
     Status.Invalid -> println("Token is invalid")
     Status.Suspended -> println("Token is suspended")
-    is Status.ApplicationSpecific -> println("Application-specific status: ${statusAtIndex42.value}")
-    is Status.Reserved -> println("Reserved status: ${statusAtIndex42.value}")
+    is Status.ApplicationSpecific -> println("Application-specific status: ${status.value}")
+    is Status.Reserved -> println("Reserved status: ${status.value}")
 }
 ```
 ### Get Status
