@@ -67,7 +67,35 @@ dependencies {
 ```
 ## Use cases supported
 
+- [Get Status List Token](#get-status-list-token)
+- [Read a Status List](#read-a-status-list)
+- [Get Status](#get-status) 
 
+### Get Status List Token
+
+As a `Relying Party` fetch a `Status List Token`.
+
+Library provides for this use case the interface [GetStatusListToken](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/GetStatusListToken.kt)
+
+### Read a Status List
+
+As a `Relying Party` be able to read a `Status List` at a specific index.
+
+It is assumed that the caller has already [fetched](#get-status-list-token) 
+the `Status List` (via a `Status List Token`)
+
+Library provides for this use case the interface [ReadStatus](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/ReadStatus.kt)
+
+
+### Get Status
+
+As a `Relying Party` [fetch](#get-status-list-token) the corresponding `Status List Token` 
+to validate the status of that `Referenced Token`
+
+It is assumed that the caller has extracted from the `Referenced Token` 
+a reference to a `status_list`.
+
+Library provides for this use case the interface [GetStatus](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/GetStatus.kt)
 
 ## How to contribute
 
