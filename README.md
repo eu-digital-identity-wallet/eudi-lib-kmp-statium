@@ -22,6 +22,9 @@ It implements the Token Status List Specification [draft 10](https://www.ietf.or
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
 
+> [!NOTE]
+> Currently, Statium supports JWT format for the Status List Token.
+
 ## Disclaimer
 
 The released software is an initial development release version:
@@ -113,7 +116,12 @@ val result = getStatusListToken(uri, null) // null means "now"
 val claims : StatusListTokenClaims = result.getOrThrow()
 println("Status list token claims: $claims")
 ```
-
+> [!IMPORTANT]
+> Statium doesn't verify the signature of the JWT, given that Token Status List specification lets 
+> ecosystems define their own processing rules. For this reason, you need to provide an implementation
+> of [VerifyStatusListTokenSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt).
+> This will be used to verify the signature of the Status List Token after it has been fetched.
+ 
 ### Read a Status List
 
 As a `Relying Party` be able to read a `Status List` at a specific index.
