@@ -65,6 +65,22 @@ dependencies {
     implementation("eu.europa.ec.eudi:eudi-lib-kmp-statium-android:$statium_ver")
 }
 ```
+
+### Ktor
+
+Statium uses [Ktor](https://ktor.io/) to perform HTTP Requests. Statium doesn't use a specific Client Engine. 
+To use Statium in your project, configure your preferred Client Engine implementation as well.
+
+A list of available Client Engines can be found [here](https://ktor.io/docs/client-engines.html)
+
+For instance, to use OkHttp add the following dependency:
+
+```kotlin
+dependencies {
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
+}
+```
+
 ## Use cases supported
 
 - [Get Status List Token](#get-status-list-token)

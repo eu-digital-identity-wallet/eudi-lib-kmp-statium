@@ -130,23 +130,23 @@ kotlin {
         }
 
         jvmMain {
+            dependencies { }
+        }
+
+        jvmTest {
             dependencies {
                 implementation(libs.ktor.client.java)
             }
         }
 
-        jvmTest {
-            dependencies { }
-        }
-
         androidMain {
-            dependencies {
-                implementation(libs.ktor.client.okhttp)
-            }
+            dependencies { }
         }
 
         androidUnitTest {
-            dependencies { }
+            dependencies {
+                implementation(libs.ktor.client.okhttp)
+            }
         }
     }
 }
