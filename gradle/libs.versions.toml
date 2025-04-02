@@ -12,6 +12,7 @@ ktlint = "1.2.1"
 dependency-check = "9.0.9"
 kover = "0.9.1"
 sonarqube = "6.0.1.5171"
+dokka = "1.9.20"
 
 [libraries]
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
@@ -36,3 +37,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 dependency-check = { id = "org.owasp.dependencycheck", version.ref = "dependency-check" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

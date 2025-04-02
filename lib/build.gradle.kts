@@ -1,5 +1,10 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -10,6 +15,7 @@ plugins {
     alias(libs.plugins.dependency.check)
     alias(libs.plugins.kover)
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.dokka)
 }
 
 repositories {
@@ -172,6 +178,14 @@ dependencyCheck {
 }
 
 mavenPublishing {
+    configure(
+        KotlinMultiplatform(
+            javadocJar = JavadocJar.Dokka(tasks.dokkaHtml.name),
+            sourcesJar = true,
+            androidVariantsToPublish = listOf("release"),
+        ),
+    )
+
     coordinates(
         groupId = properties["group"].toString(),
         artifactId = rootProject.name,
@@ -209,5 +223,38 @@ sonar {
     properties {
         val report = "${project.layout.buildDirectory.asFile.get().absolutePath}/reports/kover/report.xml"
         property("sonar.coverage.jacoco.xmlReportPaths", report)
+    }
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    dokkaSourceSets {
+        configureEach {
+            // used as project name in the header
+            moduleName.set(properties["POM_NAME"].toString())
+            moduleVersion.set(project.version.toString())
+
+            // contains descriptions for the module and the packages
+            // includes.from("Module.md")
+
+            documentedVisibilities.set(
+                setOf(
+                    DokkaConfiguration.Visibility.PUBLIC,
+                    DokkaConfiguration.Visibility.PROTECTED,
+                ),
+            )
+
+            val remoteSourceUrl =
+                System.getenv()["GIT_REF_NAME"]?.let {
+                    URI.create("${properties["POM_SCM_URL"]}/tree/$it/${project.layout.projectDirectory.asFile.name}/src").toURL()
+                }
+            remoteSourceUrl
+                ?.let {
+                    sourceLink {
+                        localDirectory.set(projectDir.resolve("src"))
+                        remoteUrl.set(it)
+                        remoteLineSuffix.set("#L")
+                    }
+                }
+        }
     }
 }
