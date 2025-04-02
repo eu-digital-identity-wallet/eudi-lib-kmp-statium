@@ -16,7 +16,6 @@
 package eu.europa.ec.eudi.statium
 
 import io.ktor.client.*
-import jdk.internal.org.jline.utils.Status.getStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -27,7 +26,8 @@ import kotlin.test.assertEquals
 
 class GetStatusTest {
 
-    @Test @Ignore
+    @Test
+    @Ignore
     fun testGetTokenStatusList() =
         doTest(
             expectedStatus = Status.Valid,
