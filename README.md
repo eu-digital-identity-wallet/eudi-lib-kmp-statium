@@ -9,6 +9,7 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 ## Table of contents
 
 * [Overview](#overview)
+* [Disclaimer](#disclaimer)
 * [Installation](#installation)
 * [Use cases supported](#use-cases-supported)
 * [How to contribute](#how-to-contribute)
@@ -20,6 +21,19 @@ Statium is a Kotlin multiplatform library supporting JVM and Android platforms.
 It implements the Token Status List Specification [draft 10](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-10.html), 
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
+
+## Disclaimer
+
+The released software is an initial development release version:
+-  The initial development release is an early endeavor reflecting the efforts of a short time-boxed period, and by no means can be considered as the final product.
+-  The initial development release may be changed substantially over time, might introduce new features but also may change or remove existing ones, potentially breaking compatibility with your existing code.
+-  The initial development release is limited in functional scope.
+-  The initial development release may contain errors or design flaws and other problems that could cause system or other failures and data loss.
+-  The initial development release has reduced security, privacy, availability, and reliability standards relative to future releases. This could make the software slower, less reliable, or more vulnerable to attacks than mature software.
+-  The initial development release is not yet comprehensively documented.
+-  Users of the software must perform sufficient engineering and additional testing to properly evaluate their application and determine whether any of the open-sourced components is suitable for use in that application.
+-  We strongly recommend not putting this version of the software into production use.
+-  Only the latest version of the software will be supported
 
 ## Installation
 
@@ -51,10 +65,8 @@ dependencies {
     implementation("eu.europa.ec.eudi:eudi-lib-kmp-statium-android:$statium_ver")
 }
 ```
-
-
-
 ## Use cases supported
+
 
 
 ## How to contribute
