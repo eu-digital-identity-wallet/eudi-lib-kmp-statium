@@ -77,6 +77,27 @@ As a `Relying Party` fetch a `Status List Token`.
 
 Library provides for this use case the interface [GetStatusListToken](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/GetStatusListToken.kt)
 
+```kotlin
+// Create an instance of GetStatusListToken using the usingJwt factory method
+val getStatusListToken: GetStatusListToken = GetStatusListToken.usingJwt(
+    clock = Clock.System,
+    httpClientFactory = {
+        HttpClient {
+            // Configure your HTTP client here
+        }
+    },
+    verifyStatusListTokenSignature = VerifyStatusListTokenSignature.Ignore // Not for production
+)
+
+// Use the GetStatusListToken instance to fetch a status list token
+val uri = "https://example.com/status-list"
+val result = getStatusListToken(uri, null) // null means "now"
+
+// Handle the result
+val claims : StatusListTokenClaims = result.getOrThrow()
+println("Status list token claims: $claims")
+```
+
 ### Read a Status List
 
 As a `Relying Party` be able to read a `Status List` at a specific index.
@@ -109,6 +130,36 @@ It is assumed that the caller has extracted from the `Referenced Token`
 a reference to a `status_list`.
 
 Library provides for this use case the interface [GetStatus](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/GetStatus.kt)
+
+```kotlin
+// Create an instance of GetStatusListToken (as shown in the Get Status List Token section)
+val getStatusListToken: GetStatusListToken = TODO("Check above")
+
+// Create an instance of GetStatus using the GetStatusListToken
+val getStatus: GetStatus = GetStatus(getStatusListToken)
+
+// Assuming you have a StatusReference from a Referenced Token
+val statusReference = StatusReference(
+    index = StatusIndex(42),
+    uri = "https://example.com/status-list"
+)
+
+// Use the GetStatus instance to check the status of the Referenced Token
+val status = runBlocking {
+    with(getStatus) {
+        statusReference.status(at = null).getOrThrow() // null means "now"
+    }
+}
+
+// Handle the result
+when (status) {
+    Status.Valid -> println("Token is valid")
+    Status.Invalid -> println("Token is invalid")
+    Status.Suspended -> println("Token is suspended")
+    is Status.ApplicationSpecific -> println("Application-specific status: ${status.value}")
+    is Status.Reserved -> println("Reserved status: ${status.value}")
+}
+```
 
 ## How to contribute
 
