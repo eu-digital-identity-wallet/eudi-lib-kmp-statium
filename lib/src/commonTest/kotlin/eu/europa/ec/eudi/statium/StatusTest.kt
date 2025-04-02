@@ -18,6 +18,8 @@ package eu.europa.ec.eudi.statium
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class StatusTest {
 
@@ -113,20 +115,19 @@ class StatusTest {
     @Test
     fun testIsApplicationSpecificHappyPath() {
         // Test exact match with STATUS_APPLICATION_SPECIFIC (0x03)
-        assertEquals(true, Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC))
+        assertTrue(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC))
 
         // Test values in the application specific range (0x0B..0x0F)
-        assertEquals(true, Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START))
-        assertEquals(true, Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END))
-        assertEquals(true, Status.isApplicationSpecific(0x0C.toByte()))
-        assertEquals(true, Status.isApplicationSpecific(0x0D.toByte()))
-        assertEquals(true, Status.isApplicationSpecific(0x0E.toByte()))
+        assertTrue(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START))
+        assertTrue(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END))
+        assertTrue(Status.isApplicationSpecific(0x0C.toByte()))
+        assertTrue(Status.isApplicationSpecific(0x0D.toByte()))
+        assertTrue(Status.isApplicationSpecific(0x0E.toByte()))
 
         // Test random application-specific values
         repeat(10) {
             val randomValue = generateRandomApplicationSpecificByte()
-            assertEquals(
-                true,
+            assertTrue(
                 Status.isApplicationSpecific(randomValue),
                 "Random value 0x${randomValue.toString(16)} should be application specific",
             )
@@ -136,13 +137,61 @@ class StatusTest {
     @Test
     fun testIsApplicationSpecificUnhappyPath() {
         // Test standard status values
-        assertEquals(false, Status.isApplicationSpecific(TokenStatusListSpec.STATUS_VALID))
-        assertEquals(false, Status.isApplicationSpecific(TokenStatusListSpec.STATUS_INVALID))
-        assertEquals(false, Status.isApplicationSpecific(TokenStatusListSpec.STATUS_SUSPENDED))
+        assertFalse(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_VALID))
+        assertFalse(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_INVALID))
+        assertFalse(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_SUSPENDED))
 
         // Test values outside the application specific range
-        assertEquals(false, Status.isApplicationSpecific(0x04.toByte()))
-        assertEquals(false, Status.isApplicationSpecific(0x0A.toByte()))
-        assertEquals(false, Status.isApplicationSpecific(0x10.toByte()))
+        assertFalse(Status.isApplicationSpecific(0x04.toByte()))
+        assertFalse(Status.isApplicationSpecific(0x0A.toByte()))
+        assertFalse(Status.isApplicationSpecific(0x10.toByte()))
+    }
+
+    @Test
+    fun testIsAvailableFor() {
+        // Valid and Invalid can be represented by any BitsPerStatus
+        assertTrue(Status.Valid.isAvailableFor(BitsPerStatus.One))
+        assertTrue(Status.Valid.isAvailableFor(BitsPerStatus.Two))
+        assertTrue(Status.Valid.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(Status.Valid.isAvailableFor(BitsPerStatus.Eight))
+
+        assertTrue(Status.Invalid.isAvailableFor(BitsPerStatus.One))
+        assertTrue(Status.Invalid.isAvailableFor(BitsPerStatus.Two))
+        assertTrue(Status.Invalid.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(Status.Invalid.isAvailableFor(BitsPerStatus.Eight))
+
+        // Suspended (0x02) cannot be represented with BitsPerStatus.One
+        assertFalse(Status.Suspended.isAvailableFor(BitsPerStatus.One))
+        assertTrue(Status.Suspended.isAvailableFor(BitsPerStatus.Two))
+        assertTrue(Status.Suspended.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(Status.Suspended.isAvailableFor(BitsPerStatus.Eight))
+
+        // ApplicationSpecific (0x03) cannot be represented with BitsPerStatus.One
+        val appSpecific = Status.ApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC)
+        assertFalse(appSpecific.isAvailableFor(BitsPerStatus.One))
+        assertTrue(appSpecific.isAvailableFor(BitsPerStatus.Two))
+        assertTrue(appSpecific.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(appSpecific.isAvailableFor(BitsPerStatus.Eight))
+
+        // ApplicationSpecific in range (0x0B-0x0F) cannot be represented with BitsPerStatus.One or BitsPerStatus.Two
+        val appSpecificRange = Status.ApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START)
+        assertFalse(appSpecificRange.isAvailableFor(BitsPerStatus.One))
+        assertFalse(appSpecificRange.isAvailableFor(BitsPerStatus.Two))
+        assertTrue(appSpecificRange.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(appSpecificRange.isAvailableFor(BitsPerStatus.Eight))
+
+        // Reserved (0x04) cannot be represented with BitsPerStatus.One
+        val reserved = Status.Reserved(0x04.toByte())
+        assertFalse(reserved.isAvailableFor(BitsPerStatus.One))
+        assertFalse(reserved.isAvailableFor(BitsPerStatus.Two))
+        assertTrue(reserved.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(reserved.isAvailableFor(BitsPerStatus.Eight))
+
+        // Reserved (0x10) cannot be represented with BitsPerStatus.One, BitsPerStatus.Two, or BitsPerStatus.Four
+        val reservedHigher = Status.Reserved(0x10.toByte())
+        assertFalse(reservedHigher.isAvailableFor(BitsPerStatus.One))
+        assertFalse(reservedHigher.isAvailableFor(BitsPerStatus.Two))
+        assertFalse(reservedHigher.isAvailableFor(BitsPerStatus.Four))
+        assertTrue(reservedHigher.isAvailableFor(BitsPerStatus.Eight))
     }
 }
