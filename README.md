@@ -86,7 +86,20 @@ the `Status List` (via a `Status List Token`)
 
 Library provides for this use case the interface [ReadStatus](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/ReadStatus.kt)
 
-
+```kotlin
+// Assuming you have already obtained a StatusListTokenClaims
+val claims: StatusListTokenClaims = obtainStatusListTokenClaims() // This function is not shown here
+val readStatus: ReadStatus = ReadStatus.fromStatusList(claims.statusList).getOrThrow()
+val status = readStatus(StatusIndex(5)).getOrThrow() // check index 5
+// Pattern match on status
+when (status) {
+    Status.Valid -> println("Token is valid")
+    Status.Invalid -> println("Token is invalid")
+    Status.Suspended -> println("Token is suspended")
+    is Status.ApplicationSpecific -> println("Application-specific status: ${statusAtIndex42.value}")
+    is Status.Reserved -> println("Reserved status: ${statusAtIndex42.value}")
+}
+```
 ### Get Status
 
 As a `Relying Party` [fetch](#get-status-list-token) the corresponding `Status List Token` 
