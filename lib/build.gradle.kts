@@ -187,9 +187,9 @@ mavenPublishing {
     )
 
     coordinates(
-        groupId = properties["group"].toString(),
-        artifactId = rootProject.name,
-        version = properties["version"].toString(),
+        groupId = group.toString(),
+        artifactId = "eudi-lib-kmp-statium",
+        version = version.toString(),
     )
 
     pom {
