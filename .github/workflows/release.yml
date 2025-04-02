@@ -31,10 +31,9 @@ jobs:
           distribution: temurin
           java-version: '17'
           architecture: x64
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/wrapper-validation@v4
+      - uses: gradle/actions/setup-gradle@v4
       - name: Publish with Gradle
-        run: ./gradlew clean build publishAllPublicationsToMavenCentral --full-stacktrace --no-configuration-cache
         env:
           CI: true
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.OSSRH_GPG_KEY_ID }}
@@ -42,3 +41,4 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.OSSRH_GPG_PASSPHRASE }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+        run: ./gradlew clean build test publishAllPublicationsToMavenCentral --full-stacktrace --no-configuration-cache
