@@ -87,5 +87,19 @@ public fun BitsPerStatus.readStatusByte(statusByte: Byte, bitPosition: Int): Sta
         Eight -> 0b11111111
     }
     val statusValue = ((statusByte.toInt() and (baseMask shl bitPosition)) shr bitPosition)
-    return Status(statusValue.toByte())
+    val status = Status(statusValue.toByte())
+    return ensureRepresentable(status, this)
+}
+
+internal fun ensureRepresentable(status: Status, bitsPerStatus: BitsPerStatus): Status =
+    status.apply {
+        check(isAvailableFor(bitsPerStatus)) {
+            "Status (${this.toByte()}) cannot be represented with ${bitsPerStatus.bits} bits"
+        }
+    }
+
+internal fun Status.isAvailableFor(bitsPerStatus: BitsPerStatus): Boolean {
+    val statusValue = this.toByte().toInt() and 0xFF
+    val maxValue = (1 shl bitsPerStatus.bits) - 1
+    return statusValue <= maxValue
 }
