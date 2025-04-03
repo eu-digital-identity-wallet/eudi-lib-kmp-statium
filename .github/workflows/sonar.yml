@@ -29,7 +29,6 @@ jobs:
         with:
           args: >
             -Dsonar.projectBaseDir=${{ github.workspace }}
-            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.organization=eu-digital-identity-wallet
             -Dsonar.projectKey=eu-digital-identity-wallet_eudi-lib-kmp-statium
             -Dsonar.language=kotlin
