@@ -19,6 +19,7 @@ import eu.europa.ec.eudi.statium.Status.Companion.applicationSpecificRange
 import eu.europa.ec.eudi.statium.Status.Companion.isApplicationSpecific
 import eu.europa.ec.eudi.statium.jose.RFC7519
 import eu.europa.ec.eudi.statium.misc.*
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -92,16 +93,26 @@ public enum class StatusListTokenFormat {
 }
 
 /**
+ * A type alias for a compressed [ByteArray] that contains
+ * How this type is serialized depends on the serialization format
+ *
+ * @see StatiumJsonSerializersModule
+ */
+public typealias CompressedByteArray = @Contextual ByteArray
+
+/**
  * Status list representation
  *
  * @param bytesPerStatus The number of bits per Referenced Token in the Status List
  * @param compressedList The compressed status values for all the Referenced Tokens it conveys statuses for
  * @param aggregationUri A URI to retrieve the Status List Aggregation for this type of Referenced Token or Issuer
+ *
+ * @see StatiumJsonSerializersModule
  */
 @Serializable
 public data class StatusList(
     @SerialName(TokenStatusListSpec.BITS) @Required val bytesPerStatus: BitsPerStatus,
-    @SerialName(TokenStatusListSpec.LIST) @Required val compressedList: ByteArrayAsBase64UrlNoPadding,
+    @SerialName(TokenStatusListSpec.LIST) @Required val compressedList: CompressedByteArray,
     @SerialName(TokenStatusListSpec.AGGREGATION_URI) val aggregationUri: String? = null,
 ) {
     public companion object {

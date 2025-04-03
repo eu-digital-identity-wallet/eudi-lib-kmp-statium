@@ -15,8 +15,8 @@
  */
 package eu.europa.ec.eudi.statium
 
+import eu.europa.ec.eudi.statium.misc.JsonIgnoringUnknownKeys
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -28,7 +28,7 @@ class TestVector(
     @OptIn(ExperimentalStdlibApi::class)
     constructor(expectedStatuses: Map<Int, Int>, statusListJson: String, statusListCborHex: String) : this(
         expectedStatuses.map { (i, s) -> StatusIndex(i) to Status(s.toByte()) }.toMap(),
-        Json.decodeFromString(StatusList.serializer(), statusListJson),
+        JsonIgnoringUnknownKeys.decodeFromString(StatusList.serializer(), statusListJson),
         statusListCborHex.hexToByteArray(HexFormat.Default),
     )
 }

@@ -16,17 +16,12 @@
 package eu.europa.ec.eudi.statium.misc
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-
-public typealias ByteArrayAsBase64UrlNoPadding =
-    @Serializable(with = ByteArrayAsBase64UrlNoPaddingSerializer::class)
-    ByteArray
 
 /**
  * A parameterized serializer that converts between a type T and a Base64 URL-encoded (no padding) string.

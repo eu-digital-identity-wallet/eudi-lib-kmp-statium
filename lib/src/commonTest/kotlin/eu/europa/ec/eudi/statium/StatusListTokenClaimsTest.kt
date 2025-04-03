@@ -15,8 +15,8 @@
  */
 package eu.europa.ec.eudi.statium
 
+import eu.europa.ec.eudi.statium.misc.JsonIgnoringUnknownKeys
 import kotlinx.datetime.Instant
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -25,6 +25,8 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class StatusListTokenClaimsTest {
+
+    private val jsonSupport = JsonIgnoringUnknownKeys
 
     @Test
     fun testCreation() {
@@ -93,7 +95,7 @@ class StatusListTokenClaimsTest {
             statusList = statusList,
         )
 
-        val json = Json.encodeToString(StatusListTokenClaims.serializer(), claims)
+        val json = jsonSupport.encodeToString(StatusListTokenClaims.serializer(), claims)
 
         // Verify the JSON contains the expected field names and values
         val expectedJson = """{"sub":"https://example.com/issuer","iat":1625097600,"exp":1656633600,"ttl":2592000,"status_list":{"bits":1,"lst":"eNrt3AENwCAMAEGogklACtKQPg9LugC9k_ACvreiogEAAKkeCQAAAAAAAAAAAAAAAAAAAIBylgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXG9IAAAAAAAAAPwsJAAAAAAAAAAAAAAAvhsSAAAAAAAAAAAA7KpLAAAAAAAAAAAAAAAAAAAAAJsLCQAAAAAAAAAAADjelAAAAAAAAAAAKjDMAQAAAACAZC8L2AEb"}}"""
@@ -104,7 +106,7 @@ class StatusListTokenClaimsTest {
     fun testDeserialization() {
         val json = """{"sub":"https://example.com/issuer","iat":1625097600,"exp":1656633600,"ttl":2592000,"status_list":{"bits":1,"lst":"eNrt3AENwCAMAEGogklACtKQPg9LugC9k_ACvreiogEAAKkeCQAAAAAAAAAAAAAAAAAAAIBylgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXG9IAAAAAAAAAPwsJAAAAAAAAAAAAAAAvhsSAAAAAAAAAAAA7KpLAAAAAAAAAAAAAAAAAAAAAJsLCQAAAAAAAAAAADjelAAAAAAAAAAAKjDMAQAAAACAZC8L2AEb"}}"""
 
-        val claims = Json.decodeFromString(StatusListTokenClaims.serializer(), json)
+        val claims = jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), json)
 
         assertEquals("https://example.com/issuer", claims.subject)
         assertEquals(Instant.fromEpochSeconds(1625097600L), claims.issuedAt)
@@ -129,8 +131,8 @@ class StatusListTokenClaimsTest {
             statusList = statusList,
         )
 
-        val json = Json.encodeToString(StatusListTokenClaims.serializer(), original)
-        val deserialized = Json.decodeFromString(StatusListTokenClaims.serializer(), json)
+        val json = jsonSupport.encodeToString(StatusListTokenClaims.serializer(), original)
+        val deserialized = jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), json)
 
         assertEquals(original, deserialized)
     }
@@ -142,15 +144,15 @@ class StatusListTokenClaimsTest {
         val jsonWithoutStatusList = """{"sub":"https://example.com/issuer","iat":1625097600,"exp":1656633600,"ttl":2592000}"""
 
         assertFailsWith<kotlinx.serialization.MissingFieldException> {
-            Json.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutSubject)
+            jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutSubject)
         }
 
         assertFailsWith<kotlinx.serialization.MissingFieldException> {
-            Json.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutIssuedAt)
+            jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutIssuedAt)
         }
 
         assertFailsWith<kotlinx.serialization.MissingFieldException> {
-            Json.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutStatusList)
+            jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutStatusList)
         }
     }
 
@@ -159,7 +161,7 @@ class StatusListTokenClaimsTest {
         // Test with TV2 (2 bits per status)
         val jsonWithTV2 = """{"sub":"https://example.com/issuer","iat":1625097600,"status_list":{"bits":2,"lst":"eNrt2zENACEQAEEuoaBABP5VIO01fCjIHTMStt9ovGVIAAAAAABAbiEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEB5WwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAID0ugQAAAAAAAAAAAAAAAAAQG12SgAAAAAAAAAAAAAAAAAAAAAAAAAAAOCSIQEAAAAAAAAAAAAAAAAAAAAAAAD8ExIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwJEuAQAAAAAAAAAAAAAAAAAAAAAAAMB9SwIAAAAAAAAAAAAAAAAAAACoYUoAAAAAAAAAAAAAAEBqH81gAQw"}}"""
 
-        val claims = Json.decodeFromString(StatusListTokenClaims.serializer(), jsonWithTV2)
+        val claims = jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), jsonWithTV2)
 
         assertEquals("https://example.com/issuer", claims.subject)
         assertEquals(Instant.fromEpochSeconds(1625097600L), claims.issuedAt)
@@ -170,7 +172,7 @@ class StatusListTokenClaimsTest {
     fun testDeserializationWithOptionalFieldsOmitted() {
         val jsonWithoutOptionalFields = """{"sub":"https://example.com/issuer","iat":1625097600,"status_list":{"bits":1,"lst":"eNrt3AENwCAMAEGogklACtKQPg9LugC9k_ACvreiogEAAKkeCQAAAAAAAAAAAAAAAAAAAIBylgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXG9IAAAAAAAAAPwsJAAAAAAAAAAAAAAAvhsSAAAAAAAAAAAA7KpLAAAAAAAAAAAAAAAAAAAAAJsLCQAAAAAAAAAAADjelAAAAAAAAAAAKjDMAQAAAACAZC8L2AEb"}}"""
 
-        val claims = Json.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutOptionalFields)
+        val claims = jsonSupport.decodeFromString(StatusListTokenClaims.serializer(), jsonWithoutOptionalFields)
 
         assertEquals("https://example.com/issuer", claims.subject)
         assertEquals(Instant.fromEpochSeconds(1625097600L), claims.issuedAt)

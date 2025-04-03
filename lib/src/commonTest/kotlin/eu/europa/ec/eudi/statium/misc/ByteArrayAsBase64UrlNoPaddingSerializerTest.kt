@@ -15,9 +15,9 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
+import eu.europa.ec.eudi.statium.CompressedByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -26,7 +26,7 @@ import kotlin.test.assertFailsWith
 
 class ByteArrayAsBase64UrlNoPaddingSerializerTest {
 
-    private val json = Json
+    private val json = JsonIgnoringUnknownKeys
 
     @Test
     fun testSerializeEmptyByteArray() {
@@ -112,20 +112,7 @@ class ByteArrayAsBase64UrlNoPaddingSerializerTest {
     fun testTypealias() {
         // Test that the ByteArrayAsBase64UrlNoPadding typealias works correctly
         @Serializable
-        data class TestData(val data: ByteArrayAsBase64UrlNoPadding) {
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is TestData) return false
-
-                if (!data.contentEquals(other.data)) return false
-
-                return true
-            }
-
-            override fun hashCode(): Int {
-                return data.fold(0) { acc, byte -> 31 * acc + byte.toInt() }
-            }
-        }
+        class TestData(val data: CompressedByteArray)
 
         val original = TestData("Hello, World!".encodeToByteArray())
         val serialized = json.encodeToString(serializer<TestData>(), original)
