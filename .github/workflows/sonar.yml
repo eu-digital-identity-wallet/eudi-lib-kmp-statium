@@ -30,7 +30,7 @@ jobs:
           args: >
             -Dsonar.projectBaseDir=${{ github.workspace }}
             -Dsonar.host.url=https://sonarcloud.io
-            -sonar.organization=${{ github.repository_owner }}
+            -Dsonar.organization=${{ github.repository_owner }}
             -Dsonar.projectKey==${{ github.repository_owner }}_${{ github.repository }}
             -Dsonar.language=kotlin
             -Dsonar.coverage.jacoco.xmlReportPaths=lib/build/reports/kover/report.xml
