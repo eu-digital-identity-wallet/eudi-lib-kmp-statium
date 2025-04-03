@@ -41,5 +41,4 @@ jobs:
             -Dsonar.java.binaries=lib/build/classes/kotlin/jvm
             -Dsonar.kotlin.binaries=lib/build/classes/kotlin/jvm
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
