@@ -30,8 +30,8 @@ jobs:
           args: >
             -Dsonar.projectBaseDir=${{ github.workspace }}
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.organization=${{ github.repository_owner }}
-            -Dsonar.projectKey=${{ github.repository_owner}}_$(echo ${{ github.repository }} | sed 's/.*\///')
+            -Dsonar.organization=eu-digital-identity-wallet
+            -Dsonar.projectKey=eu-digital-identity-wallet_eudi-lib-kmp-statium
             -Dsonar.language=kotlin
             -Dsonar.coverage.jacoco.xmlReportPaths=lib/build/reports/kover/report.xml
             -Dsonar.kotlin.coverage.reportPaths=lib/build/reports/kover/report.xml
