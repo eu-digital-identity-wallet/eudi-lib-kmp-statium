@@ -15,6 +15,7 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
+import eu.europa.ec.eudi.statium.CompressedByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
@@ -34,7 +35,7 @@ internal class JvmAndroidDecompress(private val context: CoroutineContext = Disp
      * @return The decompressed byte array
      * @throws Exception if decompression fails
      */
-    override suspend fun invoke(bytes: ByteArray): ByteArray = withContext(context) {
+    override suspend fun invoke(bytes: CompressedByteArray): ByteArray = withContext(context) {
         ByteArrayInputStream(bytes).use { inputStream ->
             InflaterInputStream(inputStream).use { inflaterStream ->
                 ByteArrayOutputStream().use { outputStream ->

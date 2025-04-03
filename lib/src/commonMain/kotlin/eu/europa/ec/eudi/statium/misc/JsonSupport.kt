@@ -15,9 +15,21 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
+import eu.europa.ec.eudi.statium.CompressedByteArray
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+
+/**
+ * [SerializersModule] for JSON format. Defines that
+ * - A [CompressedByteArray] is serialized via [ByteArrayAsBase64UrlNoPaddingSerializer]
+ */
+public val StatiumJsonSerializersModule: SerializersModule =
+    SerializersModule {
+        contextual(CompressedByteArray::class, ByteArrayAsBase64UrlNoPaddingSerializer)
+    }
 
 internal val JsonIgnoringUnknownKeys: Json =
     Json {
         ignoreUnknownKeys = true
+        serializersModule = StatiumJsonSerializersModule
     }

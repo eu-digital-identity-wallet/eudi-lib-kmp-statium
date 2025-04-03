@@ -19,6 +19,7 @@ import eu.europa.ec.eudi.statium.Status.Companion.applicationSpecificRange
 import eu.europa.ec.eudi.statium.Status.Companion.isApplicationSpecific
 import eu.europa.ec.eudi.statium.jose.RFC7519
 import eu.europa.ec.eudi.statium.misc.*
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -91,6 +92,8 @@ public enum class StatusListTokenFormat {
     CWT,
 }
 
+public typealias CompressedByteArray = @Contextual ByteArray
+
 /**
  * Status list representation
  *
@@ -101,7 +104,7 @@ public enum class StatusListTokenFormat {
 @Serializable
 public data class StatusList(
     @SerialName(TokenStatusListSpec.BITS) @Required val bytesPerStatus: BitsPerStatus,
-    @SerialName(TokenStatusListSpec.LIST) @Required val compressedList: ByteArrayAsBase64UrlNoPadding,
+    @SerialName(TokenStatusListSpec.LIST) @Required val compressedList: CompressedByteArray,
     @SerialName(TokenStatusListSpec.AGGREGATION_URI) val aggregationUri: String? = null,
 ) {
     public companion object {

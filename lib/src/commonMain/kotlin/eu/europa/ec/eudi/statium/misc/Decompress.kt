@@ -15,10 +15,12 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
+import eu.europa.ec.eudi.statium.CompressedByteArray
+
 /**
  * The byte array is compressed using DEFLATE RFC1951 with the ZLIB RFC1950 data format.
  * Implementations are RECOMMENDED to use the highest compression level available
  */
 public fun interface Decompress {
-    public suspend operator fun invoke(bytes: ByteArray): ByteArray
+    public suspend operator fun invoke(bytes: CompressedByteArray): ByteArray
 }
