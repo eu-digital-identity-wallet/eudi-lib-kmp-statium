@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.spotless)
     alias(libs.plugins.dependency.check)
     alias(libs.plugins.kover)
-    alias(libs.plugins.sonarqube)
     alias(libs.plugins.dokka)
 }
 
@@ -199,27 +198,6 @@ mavenPublishing {
             url = "${project.properties["POM_SCM_URL"]}/actions"
         }
     }
-}
-
-// Needed for compatibility with sonar.yml action
-tasks.register("jacocoTestReport") {
-    dependsOn(tasks.koverXmlReport)
-}
-
-tasks.sonarqube {
-    dependsOn(tasks.koverXmlReport)
-}
-
-sonarqube {
-    properties {
-        val report = "${project.layout.buildDirectory.asFile.get().absolutePath}/reports/kover/report.xml"
-        property("sonar.coverage.jacoco.xmlReportPaths", report)
-        property("sonar.kotlin.module.path", "")
-    }
-}
-
-tasks.sonar {
-    dependsOn(tasks.koverXmlReport)
 }
 
 tasks.withType<DokkaTask>().configureEach {
