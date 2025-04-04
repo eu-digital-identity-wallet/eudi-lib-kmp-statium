@@ -17,20 +17,11 @@ package eu.europa.ec.eudi.statium.misc
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-
-/**
- * An [Instant] that will be serialized using [EpocSecondsSerializer]
- * Can be used for claims like "exp", "iat", "nbf"
- */
-public typealias InstantAsEpocSeconds =
-    @Serializable(with = EpocSecondsSerializer::class)
-    Instant
 
 /**
  * Serializes an [kotlinx.datetime.Instant] as a [Long] representing the [kotlinx.datetime.Instant.epochSeconds]

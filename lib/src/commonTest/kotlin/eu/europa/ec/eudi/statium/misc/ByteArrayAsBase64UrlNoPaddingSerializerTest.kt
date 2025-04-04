@@ -26,66 +26,88 @@ import kotlin.test.assertFailsWith
 
 class ByteArrayAsBase64UrlNoPaddingSerializerTest {
 
-    private val json = JsonIgnoringUnknownKeys
-
     @Test
     fun testSerializeEmptyByteArray() {
         val byteArray = ByteArray(0)
-        val serialized = json.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
+        val serialized = StatiumJson.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
         assertEquals("\"\"", serialized, "Serializing an empty byte array should result in an empty string")
     }
 
     @Test
     fun testDeserializeEmptyString() {
         val serialized = "\"\""
-        val deserialized = json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
-        assertContentEquals(ByteArray(0), deserialized, "Deserializing an empty string should result in an empty byte array")
+        val deserialized = StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
+        assertContentEquals(
+            ByteArray(0),
+            deserialized,
+            "Deserializing an empty string should result in an empty byte array",
+        )
     }
 
     @Test
     fun testSerializeSimpleByteArray() {
         val byteArray = "Hello, World!".encodeToByteArray()
-        val serialized = json.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
-        assertEquals("\"SGVsbG8sIFdvcmxkIQ\"", serialized, "Serializing 'Hello, World!' bytes should result in 'SGVsbG8sIFdvcmxkIQ'")
+        val serialized = StatiumJson.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
+        assertEquals(
+            "\"SGVsbG8sIFdvcmxkIQ\"",
+            serialized,
+            "Serializing 'Hello, World!' bytes should result in 'SGVsbG8sIFdvcmxkIQ'",
+        )
     }
 
     @Test
     fun testDeserializeSimpleString() {
         val serialized = "\"SGVsbG8sIFdvcmxkIQ\""
-        val deserialized = json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
+        val deserialized = StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
         val expected = "Hello, World!".encodeToByteArray()
-        assertContentEquals(expected, deserialized, "Deserializing 'SGVsbG8sIFdvcmxkIQ' should result in 'Hello, World!' bytes")
+        assertContentEquals(
+            expected,
+            deserialized,
+            "Deserializing 'SGVsbG8sIFdvcmxkIQ' should result in 'Hello, World!' bytes",
+        )
     }
 
     @Test
     fun testSerializeWithSpecialCharacters() {
         val byteArray = "Special characters: !@#$%^&*()_+".encodeToByteArray()
-        val serialized = json.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
-        val deserialized = json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
-        assertContentEquals(byteArray, deserialized, "Serializing and then deserializing should result in the original byte array")
+        val serialized = StatiumJson.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
+        val deserialized = StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
+        assertContentEquals(
+            byteArray,
+            deserialized,
+            "Serializing and then deserializing should result in the original byte array",
+        )
     }
 
     @Test
     fun testSerializeWithNonAsciiCharacters() {
         val byteArray = "Non-ASCII characters: äöüßÄÖÜ€".encodeToByteArray()
-        val serialized = json.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
-        val deserialized = json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
-        assertContentEquals(byteArray, deserialized, "Serializing and then deserializing should result in the original byte array")
+        val serialized = StatiumJson.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
+        val deserialized = StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
+        assertContentEquals(
+            byteArray,
+            deserialized,
+            "Serializing and then deserializing should result in the original byte array",
+        )
     }
 
     @Test
     fun testSerializeBinaryData() {
         val byteArray = ByteArray(256) { it.toByte() }
-        val serialized = json.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
-        val deserialized = json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
-        assertContentEquals(byteArray, deserialized, "Serializing and then deserializing binary data should result in the original byte array")
+        val serialized = StatiumJson.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, byteArray)
+        val deserialized = StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
+        assertContentEquals(
+            byteArray,
+            deserialized,
+            "Serializing and then deserializing binary data should result in the original byte array",
+        )
     }
 
     @Test
     fun testDeserializeInvalidBase64() {
         val invalidBase64 = "\"This is not valid Base64!\""
         assertFailsWith<SerializationException> {
-            json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, invalidBase64)
+            StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, invalidBase64)
         }
     }
 
@@ -102,9 +124,13 @@ class ByteArrayAsBase64UrlNoPaddingSerializerTest {
         )
 
         for (testCase in testCases) {
-            val serialized = json.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, testCase)
-            val deserialized = json.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
-            assertContentEquals(testCase, deserialized, "Round trip serialization and deserialization should result in the original byte array")
+            val serialized = StatiumJson.encodeToString(ByteArrayAsBase64UrlNoPaddingSerializer, testCase)
+            val deserialized = StatiumJson.decodeFromString(ByteArrayAsBase64UrlNoPaddingSerializer, serialized)
+            assertContentEquals(
+                testCase,
+                deserialized,
+                "Round trip serialization and deserialization should result in the original byte array",
+            )
         }
     }
 
@@ -115,14 +141,14 @@ class ByteArrayAsBase64UrlNoPaddingSerializerTest {
         class TestData(val data: CompressedByteArray)
 
         val original = TestData("Hello, World!".encodeToByteArray())
-        val serialized = json.encodeToString(serializer<TestData>(), original)
+        val serialized = StatiumJson.encodeToString(serializer<TestData>(), original)
 
         // The serialized string should contain the Base64URL-encoded bytes
         val expected = "{\"data\":\"SGVsbG8sIFdvcmxkIQ\"}"
         assertEquals(expected, serialized, "The typealias should serialize correctly")
 
         // Deserialize and verify
-        val deserialized = json.decodeFromString<TestData>(serialized)
+        val deserialized = StatiumJson.decodeFromString<TestData>(serialized)
         assertContentEquals(original.data, deserialized.data, "The typealias should deserialize correctly")
     }
 }

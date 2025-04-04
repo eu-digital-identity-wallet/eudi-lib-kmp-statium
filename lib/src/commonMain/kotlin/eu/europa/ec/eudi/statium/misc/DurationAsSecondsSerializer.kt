@@ -16,7 +16,6 @@
 package eu.europa.ec.eudi.statium.misc
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -25,18 +24,10 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * A [Duration] that is represented in JSON
- * as seconds.
- */
-public typealias DurationAsSeconds =
-    @Serializable(with = DurationAsSecondsSerializer::class)
-    Duration
-
 internal object DurationAsSecondsSerializer : KSerializer<Duration> {
 
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.DurationAsSeconds", PrimitiveKind.LONG)
+        PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.DurationAsSecondsSerializer", PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
 

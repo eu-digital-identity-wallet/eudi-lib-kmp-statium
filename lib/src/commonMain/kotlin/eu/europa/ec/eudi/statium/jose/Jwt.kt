@@ -16,7 +16,7 @@
 package eu.europa.ec.eudi.statium.jose
 
 import eu.europa.ec.eudi.statium.misc.Base64UrlNoPadding
-import eu.europa.ec.eudi.statium.misc.JsonIgnoringUnknownKeys
+import eu.europa.ec.eudi.statium.misc.StatiumJson
 import kotlinx.io.Buffer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
@@ -24,7 +24,7 @@ import kotlinx.serialization.json.io.decodeFromSource
 internal inline fun <reified H, reified P> jwtHeaderAndPayload(jwt: String): Result<Pair<H, P>> =
     runCatching {
         val (headerPart, payloadPart, _) = parts(jwt)
-        with(JsonIgnoringUnknownKeys) {
+        with(StatiumJson) {
             val header = decodeBase64<H>(headerPart)
             val statusList = decodeBase64<P>(payloadPart)
             header to statusList
