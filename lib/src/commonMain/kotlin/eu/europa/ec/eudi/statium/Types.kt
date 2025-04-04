@@ -25,6 +25,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.CborLabel
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -49,18 +50,18 @@ public enum class BitsPerStatus(public val bits: Int) {
         internal const val BITS_PER_BYTE = 8
 
         /**
-         * Attempts to get aa [BitsPerStatus], given the number of [bits]
-         * @param bits number of bits
-         * @return the [BitsPerStatus] or null
+         * Gets a [BitsPerStatus]
+         * given the number of [bits]
          */
-        public fun fromBitsOrNull(bits: Int): BitsPerStatus? = BitsPerStatus.entries.find { it.bits == bits }
+        public fun forBits(bits: Int): BitsPerStatus? {
+            return BitsPerStatus.entries.find { it.bits == bits }
+        }
     }
 }
 
 /**
  * Represents the index to check for status information in the Status List
- *
- * @param value it MUST be a non-negative number, zero or greater
+ * The [value] MUST be a non-negative number, zero or greater
  */
 @Serializable
 @JvmInline
@@ -203,11 +204,11 @@ public value class PositiveDurationAsSeconds(public val value: DurationAsSeconds
 public data class StatusListTokenClaims
 @Throws(IllegalStateException::class)
 public constructor(
-    @SerialName(RFC7519.SUBJECT) @Required val subject: String,
-    @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
-    @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
-    @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
-    @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
+    @CborLabel(2) @SerialName(RFC7519.SUBJECT) @Required val subject: String,
+    @CborLabel(6) @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
+    @CborLabel(4) @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
+    @CborLabel(65534) @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
+    @CborLabel(65533) @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
 ) {
     init {
         require(subject.isNotBlank()) { "The subject must not be empty." }
