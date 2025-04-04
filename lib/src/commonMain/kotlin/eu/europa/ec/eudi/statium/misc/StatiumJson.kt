@@ -16,6 +16,8 @@
 package eu.europa.ec.eudi.statium.misc
 
 import eu.europa.ec.eudi.statium.CompressedByteArray
+import eu.europa.ec.eudi.statium.DurationAsSeconds
+import eu.europa.ec.eudi.statium.InstantAsEpocSeconds
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 
@@ -26,10 +28,15 @@ import kotlinx.serialization.modules.SerializersModule
 public val StatiumJsonSerializersModule: SerializersModule =
     SerializersModule {
         contextual(CompressedByteArray::class, ByteArrayAsBase64UrlNoPaddingSerializer)
+        contextual(InstantAsEpocSeconds::class, EpocSecondsSerializer)
+        contextual(DurationAsSeconds::class, DurationAsSecondsSerializer)
     }
 
-internal val JsonIgnoringUnknownKeys: Json =
+public val StatiumJson: Json =
     Json {
         ignoreUnknownKeys = true
+        encodeDefaults = false
+        explicitNulls = false
+        prettyPrint = false
         serializersModule = StatiumJsonSerializersModule
     }

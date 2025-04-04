@@ -57,6 +57,7 @@ kotlin {
                 "kotlinx.serialization.ExperimentalSerializationApi",
                 "kotlin.contracts.ExperimentalContracts",
                 "kotlin.io.encoding.ExperimentalEncodingApi",
+                "kotlin.ExperimentalStdlibApi",
             )
         freeCompilerArgs =
             listOf(

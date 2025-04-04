@@ -19,10 +19,12 @@ import eu.europa.ec.eudi.statium.Status.Companion.applicationSpecificRange
 import eu.europa.ec.eudi.statium.Status.Companion.isApplicationSpecific
 import eu.europa.ec.eudi.statium.jose.RFC7519
 import eu.europa.ec.eudi.statium.misc.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 
 /**
  * Represents the number of [bits] for a status.
@@ -153,6 +155,18 @@ public data class StatusList(
     }
 }
 
+/**
+ * An [Instant] that will be serialized using [EpocSecondsSerializer]
+ * Can be used for claims like "exp", "iat", "nbf"
+ */
+public typealias InstantAsEpocSeconds = @Contextual Instant
+
+/**
+ * A [Duration] that is represented in JSON
+ * as seconds.
+ */
+public typealias DurationAsSeconds = @Contextual Duration
+
 @Serializable
 @JvmInline
 public value class TimeToLive(public val value: DurationAsSeconds) {
@@ -169,8 +183,8 @@ public value class TimeToLive(public val value: DurationAsSeconds) {
 @Serializable
 public data class StatusListTokenClaims(
     @SerialName(RFC7519.SUBJECT) @Required val subject: String,
-    @SerialName(RFC7519.ISSUED_AT) @Required val issuedAt: InstantAsEpocSeconds,
-    @SerialName(RFC7519.EXPIRATION_TIME) val expirationTime: InstantAsEpocSeconds? = null,
+    @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
+    @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
     @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: TimeToLive? = null,
     @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
 ) {
