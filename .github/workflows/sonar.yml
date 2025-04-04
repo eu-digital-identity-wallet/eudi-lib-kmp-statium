@@ -12,11 +12,9 @@ jobs:
     name: Check secrets presence
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      DEFECT_DOJO_TOKEN: ${{ secrets.DOJO_TOKEN }}
-      DEFECT_DOJO_URL: ${{ secrets.DOJO_URL }}
     runs-on: ubuntu-latest
     steps:
-      - run: if [[ -z "$SONAR_TOKEN" ]] || [[ -z "$DEFECT_DOJO_TOKEN" ]] || [[ -z "$DEFECT_DOJO_URL" ]]; then exit 1; fi
+      - run: if [[ -z "$SONAR_TOKEN" ]]; then exit 1; fi
 
   analysis:
     name: Analysis
@@ -27,6 +25,9 @@ jobs:
       DEFECT_DOJO_URL: ${{ secrets.DOJO_URL }}
     runs-on: ubuntu-latest
     steps:
+      - run: echo "ORGANIZATION=${{ github.repository_owner}}" >> $GITHUB_ENV
+      - run: echo "PROJECT_KEY=${{ github.repository_owner}}_$(echo ${{ github.repository }} | sed 's/.*\///')" >> $GITHUB_ENV
+      - run: echo "SCAN_DATE=$(TZ='EET' date '+%Y-%m-%d')" >> $GITHUB_ENV
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -37,8 +38,6 @@ jobs:
       - uses: gradle/actions/wrapper-validation@v4
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew clean test koverXmlReport
-      - run: echo "ORGANIZATION=${{ github.repository_owner}}" >> $GITHUB_ENV
-      - run: echo "PROJECT_KEY=${{ github.repository_owner}}_$(echo ${{ github.repository }} | sed 's/.*\///')" >> $GITHUB_ENV
       - uses: sonarsource/sonarqube-scan-action@v5.1
         if: (github.event_name == 'push'|| github.event_name == 'workflow_dispatch')
         with:
@@ -75,10 +74,11 @@ jobs:
             -Dsonar.java.binaries=lib/build/classes/kotlin/jvm
             -Dsonar.kotlin.binaries=lib/build/classes/kotlin/jvm
       - uses: actions/setup-node@v4
+        if: (github.repository_owner == 'eu-digital-identity-wallet' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch'))
         with:
           node-version: 18
-      - name: Sonar Report
-        if: (github.repository_owner == 'eu-digital-identity-wallet' && github.ref_name == 'main')
+      - name: Publish Sonar Report
+        if: (github.repository_owner == 'eu-digital-identity-wallet' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch'))
         run: |
           npm cache clean --force
           npm install -g sonar-report@3.0.10
@@ -90,10 +90,6 @@ jobs:
             --output sonarreport.html \
             --application="${{ env.PROJECT_KEY }}" \
             --sonarcomponent="${{ env.PROJECT_KEY }}"
-      - run: echo "SCAN_DATE=$(TZ='EET' date '+%Y-%m-%d')" >> $GITHUB_ENV
-      - name: Send Sonar report to DefectDojo
-        if: (github.repository_owner == 'eu-digital-identity-wallet' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch'))
-        run: |
           curl -X POST "${{ env.DEFECT_DOJO_URL }}/api/v2/reimport-scan/" \
             -H "Authorization: Token $DEFECT_DOJO_TOKEN" \
             -F "active=true" \
