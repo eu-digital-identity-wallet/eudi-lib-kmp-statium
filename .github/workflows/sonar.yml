@@ -28,9 +28,11 @@ jobs:
       - run: echo "ORGANIZATION=${{ github.repository_owner}}" >> $GITHUB_ENV
       - run: echo "PROJECT_KEY=${{ github.repository_owner}}_$(echo ${{ github.repository }} | sed 's/.*\///')" >> $GITHUB_ENV
       - uses: sonarsource/sonarqube-scan-action@v5.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
+          projectBaseDir: ${{ github.workspace }}
           args: >
-            -Dsonar.projectBaseDir=${{ github.workspace }}
             -Dsonar.organization=${{ env.ORGANIZATION }}
             -Dsonar.projectKey=${{ env.PROJECT_KEY }}
             -Dsonar.scanner.skipJreProvisioning=true
@@ -42,5 +44,3 @@ jobs:
             -Dsonar.tests=lib/src/commonTest,lib/src/jvmAndAndroidTest
             -Dsonar.java.binaries=lib/build/classes/kotlin/jvm
             -Dsonar.kotlin.binaries=lib/build/classes/kotlin/jvm
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
