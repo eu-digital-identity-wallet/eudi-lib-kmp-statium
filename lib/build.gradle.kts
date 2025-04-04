@@ -4,7 +4,6 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.sonarqube.gradle.SonarProperties
 import java.net.URI
 
 plugins {
@@ -207,29 +206,12 @@ tasks.register("jacocoTestReport") {
     dependsOn(tasks.koverXmlReport)
 }
 
-fun sonarProperties(): Action<SonarProperties> =
-    Action<SonarProperties> {
-        property("sonar.sources", "src/commonMain,src/jvmAndAndroidMain")
-        property("sonar.tests", "src/commonTest,src/jvmAndAndroidTest")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/kover/report.xml")
-        property("sonar.kotlin.coverage.reportPaths", "build/reports/kover/report.xml")
-        property("sonar.kotlin.multiplatform.reportPaths", "build/reports/kover/report.xml")
-    }
-
 tasks.sonar {
     dependsOn(tasks.koverXmlReport)
 }
 
-sonar {
-    properties(sonarProperties())
-}
-
 tasks.sonarqube {
     dependsOn(tasks.koverXmlReport)
-}
-
-sonarqube {
-    properties(sonarProperties())
 }
 
 tasks.withType<DokkaTask>().configureEach {
