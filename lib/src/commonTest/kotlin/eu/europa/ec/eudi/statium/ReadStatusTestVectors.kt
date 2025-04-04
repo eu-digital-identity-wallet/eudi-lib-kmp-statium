@@ -25,7 +25,6 @@ class TestVector(
     val statusList: StatusList,
     val statusListCborBytes: ByteArray,
 ) {
-    @OptIn(ExperimentalStdlibApi::class)
     constructor(expectedStatuses: Map<Int, Int>, statusListJson: String, statusListCborHex: String) : this(
         expectedStatuses.map { (i, s) -> StatusIndex(i) to Status(s.toByte()) }.toMap(),
         StatiumJson.decodeFromString(StatusList.serializer(), statusListJson),
