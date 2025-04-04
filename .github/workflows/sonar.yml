@@ -25,12 +25,14 @@ jobs:
       - uses: gradle/actions/wrapper-validation@v4
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew clean test koverXmlReport
+      - run: echo "ORGANIZATION=${{ github.repository_owner}}" >> $GITHUB_ENV
+      - run: echo "PROJECT_KEY=${{ github.repository_owner}}_$(echo ${{ github.repository }} | sed 's/.*\///')" >> $GITHUB_ENV
       - uses: sonarsource/sonarqube-scan-action@v5.1
         with:
           args: >
             -Dsonar.projectBaseDir=${{ github.workspace }}
-            -Dsonar.organization=eu-digital-identity-wallet
-            -Dsonar.projectKey=eu-digital-identity-wallet_eudi-lib-kmp-statium
+            -Dsonar.organization=${{ env.ORGANIZATION }}
+            -Dsonar.projectKey=${{ env.PROJECT_KEY }}
             -Dsonar.language=kotlin
             -Dsonar.coverage.jacoco.xmlReportPaths=lib/build/reports/kover/report.xml
             -Dsonar.kotlin.coverage.reportPaths=lib/build/reports/kover/report.xml
