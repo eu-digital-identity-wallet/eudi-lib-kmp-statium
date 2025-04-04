@@ -35,7 +35,6 @@ jobs:
             -Dsonar.projectKey=${{ env.PROJECT_KEY }}
             -Dsonar.scanner.skipJreProvisioning=true
             -Dsonar.java.jdkHome=${{ env.JAVA_HOME }}
-            -Dsonar.scanner.jre=${{ env.JAVA_HOME }}/jre
             -Dsonar.language=kotlin
             -Dsonar.coverage.jacoco.xmlReportPaths=lib/build/reports/kover/report.xml
             -Dsonar.kotlin.coverage.reportPaths=lib/build/reports/kover/report.xml
