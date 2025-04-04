@@ -11,7 +11,6 @@ spotless = "7.0.2"
 ktlint = "1.2.1"
 dependency-check = "9.0.9"
 kover = "0.9.1"
-sonarqube = "6.0.1.5171"
 dokka = "1.9.20"
 
 [libraries]
@@ -36,5 +35,4 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 dependency-check = { id = "org.owasp.dependencycheck", version.ref = "dependency-check" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

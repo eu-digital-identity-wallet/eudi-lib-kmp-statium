@@ -1,4 +1,5 @@
-name: SAST - SonarCloud (BT) Caller
+name: SAST - SonarCloud
+
 on:
   push:
     branches-ignore:
@@ -7,10 +8,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  SAST_caller:
-    uses: eu-digital-identity-wallet/eudi-infra-ci/.github/workflows/sast_bt.yml@main
-    secrets:
+  check_secret:
+    name: Check secret presence
+    env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOJO_TOKEN: ${{ secrets.DOJO_TOKEN }}
-      DOJO_URL: ${{ secrets.DOJO_URL }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: if [[ -z "$SONAR_TOKEN" ]]; then exit 1; else echo "Secret exists. The workflow will be continued"; fi
+
+  analysis:
+    name: Analysis
+    needs: check_secret
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/wrapper-validation@v4
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew clean test koverXmlReport
+      - run: echo "ORGANIZATION=${{ github.repository_owner}}" >> $GITHUB_ENV
+      - run: echo "PROJECT_KEY=${{ github.repository_owner}}_$(echo ${{ github.repository }} | sed 's/.*\///')" >> $GITHUB_ENV
+      - uses: sonarsource/sonarqube-scan-action@v5.1
+        with:
+          projectBaseDir: ${{ github.workspace }}
+          args: >
+            -Dsonar.organization=${{ env.ORGANIZATION }}
+            -Dsonar.projectKey=${{ env.PROJECT_KEY }}
+            -Dsonar.scanner.skipJreProvisioning=true
+            -Dsonar.language=kotlin
+            -Dsonar.coverage.jacoco.xmlReportPaths=lib/build/reports/kover/report.xml
+            -Dsonar.kotlin.coverage.reportPaths=lib/build/reports/kover/report.xml
+            -Dsonar.kotlin.multiplatform.reportPaths=lib/build/reports/kover/report.xml
+            -Dsonar.sources=lib/src/commonMain,lib/src/jvmAndAndroidMain
+            -Dsonar.tests=lib/src/commonTest,lib/src/jvmAndAndroidTest
+            -Dsonar.java.binaries=lib/build/classes/kotlin/jvm
+            -Dsonar.kotlin.binaries=lib/build/classes/kotlin/jvm
