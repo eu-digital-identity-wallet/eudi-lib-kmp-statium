@@ -24,6 +24,8 @@ import kotlinx.serialization.modules.SerializersModule
 /**
  * [SerializersModule] for JSON format. Defines that
  * - A [CompressedByteArray] is serialized via [ByteArrayAsBase64UrlNoPaddingSerializer]
+ * - An [InstantAsEpocSeconds] is serialized via [EpocSecondsSerializer]
+ * - A [DurationAsSeconds] is serialized via [DurationAsSeconds]
  */
 public val StatiumJsonSerializersModule: SerializersModule =
     SerializersModule {
@@ -32,6 +34,13 @@ public val StatiumJsonSerializersModule: SerializersModule =
         contextual(DurationAsSeconds::class, DurationAsSecondsSerializer)
     }
 
+/**
+ * An instance of [Json] that
+ * - uses [StatiumJsonSerializersModule]
+ * - ignores unknown keys
+ * - doesn't encode default values
+ * - doesn't use explicit nulls
+ */
 public val StatiumJson: Json =
     Json {
         ignoreUnknownKeys = true

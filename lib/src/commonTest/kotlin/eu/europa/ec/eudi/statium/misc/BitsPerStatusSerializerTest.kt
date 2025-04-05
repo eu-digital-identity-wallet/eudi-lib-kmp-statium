@@ -63,7 +63,7 @@ class BitsPerStatusSerializerTest {
                 Json.Default.decodeFromString<BitsPerStatus>(invalidValue)
             }
             // Verify the exception has the expected message
-            assertTrue(exception.message?.contains("Unknown BitsPerStatus value") == true)
+            assertTrue(exception.message?.contains("Invalid bits value") == true)
         }
     }
 }

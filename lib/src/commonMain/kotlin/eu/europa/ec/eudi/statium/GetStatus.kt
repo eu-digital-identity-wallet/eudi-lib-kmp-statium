@@ -21,21 +21,38 @@ import kotlinx.datetime.Instant
 /**
  * Allows the caller to get the status of a [`status_list`][StatusReference],
  * found in a referenced token.
- *
  */
 public fun interface GetStatus {
     /**
-     * Gets the status of the [StatusReference]
-     * A [time point][at] can be specified
+     * Gets the status of the [StatusReference], optionally specifying a [time point][at].
+     *
+     * Note: there are some privacy preserving considerations if [at] is provided, since
+     * it can cause a time point information to be included to the query passed
+     * to the Status list token Provider.
+     *
+     * It is recommended to use [currentStatus]
+     *
+     * @receiver The reference to the status, found in a Referenced Token
+     * @param at the time point to check the status.
+     * @return the status read
      */
     public suspend fun StatusReference.status(at: Instant?): Result<Status>
+
+    /**
+     * Gets the status of the [StatusReference] at present time
+     * @receiver The reference to the status, found in a Referenced Token
+     * @return the status read
+     * */
+    public suspend fun StatusReference.currentStatus(): Result<Status> = status(at = null)
 
     public companion object {
 
         /**
          * Factory method for creating an instance of [GetStatus],
-         * given a [way][getStatusListToken] to fetch the Status List token
-         * and a [way][Decompress] to decompress its content
+         *
+         * @param getStatusListToken a way to fetch the Status List token
+         * @param decompress a way to decompress the status list contents. If not provided defaults to [platformDecompress]
+         * @return an instance of [GetStatus]
          */
         public operator fun invoke(
             getStatusListToken: GetStatusListToken,

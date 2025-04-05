@@ -174,7 +174,7 @@ class ReadStatusTest {
     }
 
     internal fun assertEquals(expected: Int, actual: Status?) {
-        assertEquals(Status(expected.toByte()), actual)
+        assertEquals(Status(expected.toUByte()), actual)
     }
 }
 

@@ -27,7 +27,7 @@ import kotlinx.serialization.encoding.Encoder
 internal object BitsPerStatusSerializer : KSerializer<BitsPerStatus> {
 
     override val descriptor: SerialDescriptor
-        get() = PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.BitsPerStatus", PrimitiveKind.INT)
+        get() = PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.BitsPerStatusSerializer", PrimitiveKind.INT)
 
     override fun serialize(encoder: Encoder, value: BitsPerStatus) {
         encoder.encodeInt(value.bits)
@@ -35,7 +35,7 @@ internal object BitsPerStatusSerializer : KSerializer<BitsPerStatus> {
 
     override fun deserialize(decoder: Decoder): BitsPerStatus {
         val bits = decoder.decodeInt()
-        return BitsPerStatus.forBits(bits)
-            ?: throw SerializationException("Unknown BitsPerStatus value: $bits")
+        return BitsPerStatus.fromBitsOrNull(bits)
+            ?: throw SerializationException("Invalid bits value: $bits")
     }
 }
