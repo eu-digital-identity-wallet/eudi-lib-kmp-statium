@@ -35,7 +35,7 @@ internal object BitsPerStatusSerializer : KSerializer<BitsPerStatus> {
 
     override fun deserialize(decoder: Decoder): BitsPerStatus {
         val bits = decoder.decodeInt()
-        return BitsPerStatus.forBits(bits)
+        return BitsPerStatus.fromBitsOrNull(bits)
             ?: throw SerializationException("Invalid bits value: $bits")
     }
 }
