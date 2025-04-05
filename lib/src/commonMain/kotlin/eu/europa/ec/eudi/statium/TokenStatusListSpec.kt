@@ -31,12 +31,12 @@ public object TokenStatusListSpec {
     public const val TIME_TO_LIVE: String = "ttl"
     public const val TIME: String = "time"
 
-    public const val STATUS_VALID: Byte = 0x00
-    public const val STATUS_INVALID: Byte = 0x01
-    public const val STATUS_SUSPENDED: Byte = 0x02
-    public const val STATUS_APPLICATION_SPECIFIC: Byte = 0x03
-    public const val STATUS_APPLICATION_SPECIFIC_RANGE_START: Byte = 0x0B
-    public const val STATUS_APPLICATION_SPECIFIC_RANGE_END: Byte = 0x0F
+    public const val STATUS_VALID: UByte = 0x00u
+    public const val STATUS_INVALID: UByte = 0x01u
+    public const val STATUS_SUSPENDED: UByte = 0x02u
+    public const val STATUS_APPLICATION_SPECIFIC: UByte = 0x03u
+    public const val STATUS_APPLICATION_SPECIFIC_RANGE_START: UByte = 0x0Bu
+    public const val STATUS_APPLICATION_SPECIFIC_RANGE_END: UByte = 0x0Fu
 
     public const val MEDIA_SUBTYPE_STATUS_LIST_JWT: String = "statuslist+jwt"
     public const val MEDIA_TYPE_APPLICATION_STATUS_LIST_JWT: String = "application/$MEDIA_SUBTYPE_STATUS_LIST_JWT"

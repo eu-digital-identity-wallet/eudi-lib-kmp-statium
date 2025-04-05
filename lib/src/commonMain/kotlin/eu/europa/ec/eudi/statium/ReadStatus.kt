@@ -16,7 +16,6 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.BitsPerStatus.*
-import eu.europa.ec.eudi.statium.BitsPerStatus.Companion.BITS_PER_BYTE
 import eu.europa.ec.eudi.statium.misc.Decompress
 
 /**
@@ -38,7 +37,7 @@ public fun interface ReadStatus {
                     with(bitsPerStatus) {
                         val (bytePosition, bitPosition) = byteAndBitPosition(index)
                         val byte = statusList[bytePosition]
-                        readStatusByte(byte, bitPosition)
+                        readStatusByte(byte, bitPosition).getOrThrow()
                     }
                 }
             }
@@ -46,7 +45,10 @@ public fun interface ReadStatus {
         /**
          * Creates a [ReadStatus] instance, for a [statusList], given a [Decompress] function
          */
-        public suspend fun fromStatusList(statusList: StatusList, decompress: Decompress = platformDecompress()): Result<ReadStatus> =
+        public suspend fun fromStatusList(
+            statusList: StatusList,
+            decompress: Decompress = platformDecompress(),
+        ): Result<ReadStatus> =
             runCatching {
                 val decompressedList = decompress(statusList.compressedList)
                 fromByteArray(statusList.bytesPerStatus, decompressedList)
@@ -61,6 +63,11 @@ public fun interface ReadStatus {
  *
  * To read the status, you should read the byte at the position returned on the left of the result,
  * then locate the bit (at the right of the result) and finally read as many bits as the [BitsPerStatus]
+ *
+ * @receiver The bits for the status encoding
+ * @param index the index of the status within the Status List
+ * @return the position of the byte and the bit to be read
+ *
  */
 public fun BitsPerStatus.byteAndBitPosition(index: StatusIndex): Pair<Int, Int> {
     val bytePosition = index.value / statusesPerByte
@@ -72,13 +79,18 @@ public fun BitsPerStatus.byteAndBitPosition(index: StatusIndex): Pair<Int, Int> 
 }
 
 /**
- * Reads from a [byte of the status list][statusByte] the status
+ * Attempts to read from a [byte of the status list][statusByte] the status
  * that is located at [bitPosition]
  *
+ * @receiver The bits for the status encoding
+ * @param statusByte The byte from which to extract the stratus
+ * @param bitPosition The bit position within the [statusByte] where the status begins
+ *
+ * @return the status read
  */
-public fun BitsPerStatus.readStatusByte(statusByte: Byte, bitPosition: Int): Status {
-    require(bitPosition in 0..BITS_PER_BYTE - 1) {
-        "Bit position must be in range [0, ${BITS_PER_BYTE - 1}]"
+public fun BitsPerStatus.readStatusByte(statusByte: Byte, bitPosition: Int): Result<Status> = runCatching {
+    require(bitPosition in 0..<BitsPerStatus.BITS_PER_BYTE) {
+        "Bit position should be in range [0,${BitsPerStatus.BITS_PER_BYTE})"
     }
     val baseMask: Int = when (this) {
         One -> 0b00000001
@@ -87,19 +99,5 @@ public fun BitsPerStatus.readStatusByte(statusByte: Byte, bitPosition: Int): Sta
         Eight -> 0b11111111
     }
     val statusValue = ((statusByte.toInt() and (baseMask shl bitPosition)) shr bitPosition)
-    val status = Status(statusValue.toByte())
-    return ensureRepresentable(status, this)
-}
-
-internal fun ensureRepresentable(status: Status, bitsPerStatus: BitsPerStatus): Status =
-    status.apply {
-        check(isAvailableFor(bitsPerStatus)) {
-            "Status (${this.toByte()}) cannot be represented with ${bitsPerStatus.bits} bits"
-        }
-    }
-
-internal fun Status.isAvailableFor(bitsPerStatus: BitsPerStatus): Boolean {
-    val statusValue = this.toByte().toInt() and 0xFF
-    val maxValue = (1 shl bitsPerStatus.bits) - 1
-    return statusValue <= maxValue
+    Status(this, statusValue.toUByte()).getOrThrow()
 }
