@@ -18,7 +18,10 @@ package eu.europa.ec.eudi.statium
 import eu.europa.ec.eudi.statium.Status.Companion.applicationSpecificRange
 import eu.europa.ec.eudi.statium.Status.Companion.isApplicationSpecific
 import eu.europa.ec.eudi.statium.jose.RFC7519
-import eu.europa.ec.eudi.statium.misc.*
+import eu.europa.ec.eudi.statium.misc.Base64UrlNoPadding
+import eu.europa.ec.eudi.statium.misc.BitsPerStatusSerializer
+import eu.europa.ec.eudi.statium.misc.EpocSecondsSerializer
+import eu.europa.ec.eudi.statium.misc.StatiumJsonSerializersModule
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
@@ -47,8 +50,9 @@ public enum class BitsPerStatus(public val bits: Int) {
         internal const val BITS_PER_BYTE = 8
 
         /**
-         * Gets a [BitsPerStatus]
-         * given the number of [bits]
+         * Attempts to get aa [BitsPerStatus], given the number of [bits]
+         * @param bits number of bits
+         * @return the [eu.europa.ec.eudi.statium.BitsPerStatus] or null
          */
         public fun forBits(bits: Int): BitsPerStatus? {
             return BitsPerStatus.entries.find { it.bits == bits }
@@ -58,7 +62,8 @@ public enum class BitsPerStatus(public val bits: Int) {
 
 /**
  * Represents the index to check for status information in the Status List
- * The [value] MUST be a non-negative number, zero or greater
+ *
+ * @param value it MUST be a non-negative number, zero or greater
  */
 @Serializable
 @JvmInline
@@ -98,7 +103,7 @@ public enum class StatusListTokenFormat {
  * A type alias for a compressed [ByteArray] that contains
  * How this type is serialized depends on the serialization format
  *
- * @see StatiumJsonSerializersModule
+ * @see StatiumJsonSerializersModule for JSON serialization
  */
 public typealias CompressedByteArray = @Contextual ByteArray
 
@@ -109,7 +114,7 @@ public typealias CompressedByteArray = @Contextual ByteArray
  * @param compressedList The compressed status values for all the Referenced Tokens it conveys statuses for
  * @param aggregationUri A URI to retrieve the Status List Aggregation for this type of Referenced Token or Issuer
  *
- * @see StatiumJsonSerializersModule
+ * @see StatiumJsonSerializersModule for JSON serialization
  */
 @Serializable
 public data class StatusList(
@@ -126,14 +131,17 @@ public data class StatusList(
          * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
          * @param base64UrlEncodedList The Base64 URL no padding encoded, compressed list
          * @param aggregationUri  A URI to retrieve the Status List Aggregation for this type of Referenced Token or Issuer
-         * @return the [eu.europa.ec.eudi.statium.StatusList] if given [base64UrlEncodedList] can be base64-decoded
+         * @return the status list
          */
         public fun fromBase64UrlEncodedList(
             bytesPerStatus: BitsPerStatus,
             base64UrlEncodedList: String,
             aggregationUri: String? = null,
         ): Result<StatusList> =
-            runCatching { StatusList(bytesPerStatus, Base64UrlNoPadding.decode(base64UrlEncodedList), aggregationUri) }
+            runCatching {
+                val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
+                StatusList(bytesPerStatus, compressedList, aggregationUri)
+            }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -158,15 +166,21 @@ public data class StatusList(
 /**
  * An [Instant] that will be serialized using [EpocSecondsSerializer]
  * Can be used for claims like "exp", "iat", "nbf"
+ * @see StatiumJsonSerializersModule for JSON serialization
  */
 public typealias InstantAsEpocSeconds = @Contextual Instant
 
 /**
- * A [Duration] that is represented in JSON
- * as seconds.
+ * A [Duration] that is represented as seconds when serialized
+ * @see StatiumJsonSerializersModule for JSON serialization
  */
 public typealias DurationAsSeconds = @Contextual Duration
 
+/**
+ * A time-to-live for the [StatusListTokenClaims]
+ * @param value a positive duration
+ * @see StatiumJsonSerializersModule for JSON serialization
+ */
 @Serializable
 @JvmInline
 public value class TimeToLive(public val value: DurationAsSeconds) {
@@ -179,9 +193,19 @@ public value class TimeToLive(public val value: DurationAsSeconds) {
 
 /**
  * The claims of a Status List Token
+ *
+ * @param subject The token's subject. It should be a URI from which the status was retrieved
+ * @param issuedAt The time when the token was issued
+ * @param expirationTime The time when the token expires
+ * @param timeToLive The duration that the token can cached
+ * @param statusList The Status List
+ *
+ * @see StatiumJsonSerializersModule for JSON serialization
  */
 @Serializable
-public data class StatusListTokenClaims(
+public data class StatusListTokenClaims
+@Throws(IllegalStateException::class)
+public constructor(
     @SerialName(RFC7519.SUBJECT) @Required val subject: String,
     @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
     @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
@@ -196,7 +220,7 @@ public data class StatusListTokenClaims(
 /**
  * The registered status types
  */
-public sealed interface Status {
+public sealed interface Status : Comparable<Status> {
 
     /**
      * Indicates a valid referenced token
@@ -223,18 +247,18 @@ public sealed interface Status {
      *
      * Check [isApplicationSpecific] for the restrictions of [value]
      */
-    public data class ApplicationSpecific internal constructor(val value: Byte) : Status
+    public data class ApplicationSpecific internal constructor(val value: UByte) : Status
 
     /**
      * Statuses reserved for future registration.
      * The [value] is not [ApplicationSpecific] neither [Valid], nor [Invalid]
      */
-    public data class Reserved internal constructor(val value: Byte) : Status
+    public data class Reserved internal constructor(val value: UByte) : Status
 
     /**
-     * The value the status in [Byte]
+     * The value the status in [UByte]
      */
-    public fun toByte(): Byte = when (this) {
+    public fun toUByte(): UByte = when (this) {
         Valid -> TokenStatusListSpec.STATUS_VALID
         Invalid -> TokenStatusListSpec.STATUS_INVALID
         Suspended -> TokenStatusListSpec.STATUS_SUSPENDED
@@ -242,16 +266,44 @@ public sealed interface Status {
         is Reserved -> value
     }
 
+    @Deprecated(
+        message = "This method will be removed in 0.3.x",
+        replaceWith = ReplaceWith("toUByte().toByte()"),
+    )
+    public fun toByte(): Byte = toUByte().toByte()
+
+    override fun compareTo(other: Status): Int = this.toUByte().compareTo(other.toUByte())
+
     public companion object {
         /**
          * Creates a [Status] given a [value].
          */
-        public operator fun invoke(value: Byte): Status = when {
+        public operator fun invoke(value: UByte): Status = when {
             value == TokenStatusListSpec.STATUS_VALID -> Valid
             value == TokenStatusListSpec.STATUS_INVALID -> Invalid
             value == TokenStatusListSpec.STATUS_SUSPENDED -> Suspended
             isApplicationSpecific(value) -> ApplicationSpecific(value)
-            else -> Reserved(value.toByte())
+            else -> Reserved(value)
+        }
+
+        /**
+         * Attempts to create a [Status].
+         * It will check that the given [statusValue] can be represented by the given [bitsPerStatus]
+         *
+         * @param bitsPerStatus the number of bits for representing the status
+         * @param statusValue the value of the status
+         */
+        public operator fun invoke(bitsPerStatus: BitsPerStatus, statusValue: UByte): Result<Status> = runCatching {
+            val maxValue: UByte = when (bitsPerStatus) {
+                BitsPerStatus.One -> 1u
+                BitsPerStatus.Two -> 3u
+                BitsPerStatus.Four -> 15u
+                BitsPerStatus.Eight -> 255u
+            }
+            require(statusValue <= maxValue) {
+                "Status value$statusValue cannot be represented with ${bitsPerStatus.bits} bits"
+            }
+            Status(statusValue)
         }
 
         private val applicationSpecificRange =
@@ -261,8 +313,7 @@ public sealed interface Status {
          * According to specification returns true in case the given [value]
          * is [TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC] or in the [applicationSpecificRange]
          */
-        public fun isApplicationSpecific(value: Byte): Boolean =
-            value == TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC ||
-                value in applicationSpecificRange
+        public fun isApplicationSpecific(value: UByte): Boolean =
+            value == TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC || value in applicationSpecificRange
     }
 }

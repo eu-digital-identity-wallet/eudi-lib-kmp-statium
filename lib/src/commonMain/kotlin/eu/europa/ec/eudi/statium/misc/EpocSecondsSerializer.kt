@@ -24,11 +24,11 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 /**
- * Serializes an [kotlinx.datetime.Instant] as a [Long] representing the [kotlinx.datetime.Instant.epochSeconds]
+ * Serializes an [Instant] as a [Long] representing the [kotlinx.datetime.Instant.epochSeconds]
  */
 internal object EpocSecondsSerializer : KSerializer<Instant> {
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.EpocSeconds", PrimitiveKind.LONG)
+        PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.EpocSecondsSerializer", PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): Instant = Instant.fromEpochSeconds(decoder.decodeLong())
 
