@@ -20,12 +20,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.seconds
 
-class TimeToLiveTest {
+class PositiveDurationAsSecondsTest {
 
     @Test
     fun testCreationWithPositiveValue() {
         val duration = 60.seconds
-        val timeToLive = TimeToLive(duration)
+        val timeToLive = PositiveDurationAsSeconds(duration)
         assertEquals(duration, timeToLive.value)
     }
 
@@ -33,7 +33,7 @@ class TimeToLiveTest {
     fun testCreationWithNegativeValueFails() {
         val duration = (-60).seconds
         assertFailsWith<IllegalArgumentException> {
-            TimeToLive(duration)
+            PositiveDurationAsSeconds(duration)
         }
     }
 
@@ -41,14 +41,14 @@ class TimeToLiveTest {
     fun testCreationWithZeroValueFails() {
         val duration = 0.seconds
         assertFailsWith<IllegalArgumentException> {
-            TimeToLive(duration)
+            PositiveDurationAsSeconds(duration)
         }
     }
 
     @Test
     fun testToString() {
         val duration = 120.seconds
-        val timeToLive = TimeToLive(duration)
+        val timeToLive = PositiveDurationAsSeconds(duration)
         assertEquals(duration.toString(), timeToLive.toString())
     }
 }
