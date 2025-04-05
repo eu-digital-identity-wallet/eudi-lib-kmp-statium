@@ -183,7 +183,7 @@ public typealias DurationAsSeconds = @Contextual Duration
  */
 @Serializable
 @JvmInline
-public value class TimeToLive(public val value: DurationAsSeconds) {
+public value class PositiveDurationAsSeconds(public val value: DurationAsSeconds) {
     init {
         require(value.isPositive()) { "Time to live value must be positive" }
     }
@@ -209,7 +209,7 @@ public constructor(
     @SerialName(RFC7519.SUBJECT) @Required val subject: String,
     @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
     @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
-    @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: TimeToLive? = null,
+    @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
     @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
 ) {
     init {
