@@ -52,11 +52,9 @@ public enum class BitsPerStatus(public val bits: Int) {
         /**
          * Attempts to get aa [BitsPerStatus], given the number of [bits]
          * @param bits number of bits
-         * @return the [eu.europa.ec.eudi.statium.BitsPerStatus] or null
+         * @return the [BitsPerStatus] or null
          */
-        public fun forBits(bits: Int): BitsPerStatus? {
-            return BitsPerStatus.entries.find { it.bits == bits }
-        }
+        public fun fromBitsOrNull(bits: Int): BitsPerStatus? = BitsPerStatus.entries.find { it.bits == bits }
     }
 }
 
