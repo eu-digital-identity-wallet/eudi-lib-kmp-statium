@@ -10,39 +10,16 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.maven.publish)
-    alias(libs.plugins.spotless)
-    alias(libs.plugins.dependency.check)
     alias(libs.plugins.kover)
+    alias(libs.plugins.spotless)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.dependency.check)
 }
 
 repositories {
     mavenCentral()
     google()
-}
-
-spotless {
-    kotlin {
-        target("**/*.kt")
-        targetExclude("**/build/**/*.kt")
-        ktlint(libs.versions.ktlint.get())
-            .editorConfigOverride(
-                mapOf(
-                    "ktlint_standard_filename" to "disabled",
-                    "ktlint_standard_no-wildcard-imports" to "disabled",
-                ),
-            )
-        trimTrailingWhitespace()
-        licenseHeaderFile("../FileHeader.txt")
-        endWithNewline()
-    }
-    kotlinGradle {
-        target("**/*.gradle.kts")
-        ktlint(libs.versions.ktlint.get())
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
 }
 
 kotlin {
@@ -170,33 +147,26 @@ android {
     }
 }
 
-dependencyCheck {
-    formats = listOf("XML", "HTML")
-    nvd.apiKey = System.getenv("NVD_API_KEY") ?: properties["nvdApiKey"]?.toString() ?: ""
-    nvd.delay = 10000
-    nvd.maxRetryCount = 2
-}
-
-mavenPublishing {
-    configure(
-        KotlinMultiplatform(
-            javadocJar = JavadocJar.Dokka(tasks.dokkaHtml.name),
-            sourcesJar = true,
-            androidVariantsToPublish = listOf("release"),
-        ),
-    )
-
-    coordinates(
-        groupId = group.toString(),
-        artifactId = "eudi-lib-kmp-statium",
-        version = version.toString(),
-    )
-
-    pom {
-        ciManagement {
-            system = "github"
-            url = "${project.properties["POM_SCM_URL"]}/actions"
-        }
+spotless {
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_standard_filename" to "disabled",
+                    "ktlint_standard_no-wildcard-imports" to "disabled",
+                ),
+            )
+        trimTrailingWhitespace()
+        licenseHeaderFile("../FileHeader.txt")
+        endWithNewline()
+    }
+    kotlinGradle {
+        target("**/*.gradle.kts")
+        ktlint(libs.versions.ktlint.get())
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }
 
@@ -228,4 +198,34 @@ tasks.withType<DokkaTask>().configureEach {
                 }
         }
     }
+}
+
+mavenPublishing {
+    configure(
+        KotlinMultiplatform(
+            javadocJar = JavadocJar.Dokka(tasks.dokkaHtml.name),
+            sourcesJar = true,
+            androidVariantsToPublish = listOf("release"),
+        ),
+    )
+
+    coordinates(
+        groupId = group.toString(),
+        artifactId = "eudi-lib-kmp-statium",
+        version = version.toString(),
+    )
+
+    pom {
+        ciManagement {
+            system = "github"
+            url = "${project.properties["POM_SCM_URL"]}/actions"
+        }
+    }
+}
+
+dependencyCheck {
+    formats = listOf("XML", "HTML")
+    nvd.apiKey = System.getenv("NVD_API_KEY") ?: properties["nvdApiKey"]?.toString() ?: ""
+    nvd.delay = 10000
+    nvd.maxRetryCount = 2
 }
