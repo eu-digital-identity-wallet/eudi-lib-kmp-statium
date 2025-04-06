@@ -60,6 +60,7 @@ kotlin {
     // Set up targets
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyDefaultHierarchyTemplate {
+
         // create a new group that depends on `common`
         common {
             // Define group name without `Main` as suffix
@@ -95,28 +96,10 @@ kotlin {
             }
         }
 
-        @Suppress("unused")
-        val jvmAndAndroidMain by getting {
-            dependencies { }
-        }
-
-        @Suppress("unused")
-        val jvmAndAndroidTest by getting {
-            dependencies { }
-        }
-
-        jvmMain {
-            dependencies { }
-        }
-
         jvmTest {
             dependencies {
                 implementation(libs.ktor.client.java)
             }
-        }
-
-        androidMain {
-            dependencies { }
         }
 
         androidUnitTest {
