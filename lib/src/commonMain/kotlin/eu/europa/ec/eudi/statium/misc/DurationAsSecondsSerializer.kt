@@ -24,6 +24,9 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Serializes a [Duration] as a [Long] representing the [Duration.Companion.seconds]
+ */
 internal object DurationAsSecondsSerializer : KSerializer<Duration> {
 
     override val descriptor: SerialDescriptor =
