@@ -163,7 +163,7 @@ class StatusListTokenValidationsTest : StatusListTokenValidations {
         subject: String = this.subject,
         issuedAt: Instant = now,
         expirationTime: Instant? = null,
-        timeToLive: TimeToLive? = null,
+        timeToLive: PositiveDurationAsSeconds? = null,
     ): StatusListTokenClaims =
         StatusListTokenClaims(
             subject = subject,

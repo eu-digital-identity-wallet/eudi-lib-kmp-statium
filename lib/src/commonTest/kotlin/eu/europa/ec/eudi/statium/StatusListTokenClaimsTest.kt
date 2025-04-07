@@ -31,7 +31,7 @@ class StatusListTokenClaimsTest {
         val subject = "https://example.com/issuer"
         val issuedAt = Instant.fromEpochSeconds(1625097600L) // 2021-07-01T00:00:00Z
         val expirationTime = Instant.fromEpochSeconds(1656633600L) // 2022-07-01T00:00:00Z
-        val timeToLive = TimeToLive(30.days)
+        val timeToLive = PositiveDurationAsSeconds(30.days)
         val statusList = TestVectors.TV1.statusList
 
         val claims = StatusListTokenClaims(
@@ -82,7 +82,7 @@ class StatusListTokenClaimsTest {
         val subject = "https://example.com/issuer"
         val issuedAt = Instant.fromEpochSeconds(1625097600L) // 2021-07-01T00:00:00Z
         val expirationTime = Instant.fromEpochSeconds(1656633600L) // 2022-07-01T00:00:00Z
-        val timeToLive = TimeToLive(30.days)
+        val timeToLive = PositiveDurationAsSeconds(30.days)
         val statusList = TestVectors.TV1.statusList
 
         val claims = StatusListTokenClaims(
@@ -110,7 +110,7 @@ class StatusListTokenClaimsTest {
         assertEquals("https://example.com/issuer", claims.subject)
         assertEquals(Instant.fromEpochSeconds(1625097600L), claims.issuedAt)
         assertEquals(Instant.fromEpochSeconds(1656633600L), claims.expirationTime)
-        assertEquals(TimeToLive(2592000.seconds), claims.timeToLive)
+        assertEquals(PositiveDurationAsSeconds(2592000.seconds), claims.timeToLive)
         assertEquals(TestVectors.TV1.statusList, claims.statusList)
     }
 
@@ -119,7 +119,7 @@ class StatusListTokenClaimsTest {
         val subject = "https://example.com/issuer"
         val issuedAt = Instant.fromEpochSeconds(1625097600L)
         val expirationTime = Instant.fromEpochSeconds(1656633600L)
-        val timeToLive = TimeToLive(30.days)
+        val timeToLive = PositiveDurationAsSeconds(30.days)
         val statusList = TestVectors.TV1.statusList
 
         val original = StatusListTokenClaims(
