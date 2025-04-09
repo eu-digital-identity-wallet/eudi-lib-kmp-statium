@@ -220,13 +220,13 @@ public sealed interface Status : Comparable<Status> {
 
     /**
      * Indicates a valid referenced token
-     * It is available for a [BitsPerStatus]
+     * It is available for any [BitsPerStatus]
      */
     public data object Valid : Status
 
     /**
      * Indicates an invalid referenced token
-     * It is available for a [BitsPerStatus]
+     * It is available for any [BitsPerStatus]
      */
     public data object Invalid : Status
 
@@ -297,7 +297,7 @@ public sealed interface Status : Comparable<Status> {
                 BitsPerStatus.Eight -> 255u
             }
             require(statusValue <= maxValue) {
-                "Status value$statusValue cannot be represented with ${bitsPerStatus.bits} bits"
+                "Status $statusValue cannot be represented with ${bitsPerStatus.bits} bits"
             }
             Status(statusValue)
         }
