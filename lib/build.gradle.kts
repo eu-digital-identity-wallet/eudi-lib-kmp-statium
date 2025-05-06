@@ -43,6 +43,10 @@ kotlin {
     // JVM target
     jvm()
 
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
     // Android target
     androidTarget {
         // Set JVM target to 17 to match Java compatibility

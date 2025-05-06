@@ -18,11 +18,13 @@ package eu.europa.ec.eudi.statium
 import eu.europa.ec.eudi.statium.http.GetStatusListTokenKtorOps
 import eu.europa.ec.eudi.statium.jose.jwtHeaderAndPayload
 import io.ktor.client.*
+import io.ktor.utils.io.core.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.use
 
 public fun interface GetStatusListToken {
 

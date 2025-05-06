@@ -27,6 +27,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 import kotlin.time.Duration
 
 /**
