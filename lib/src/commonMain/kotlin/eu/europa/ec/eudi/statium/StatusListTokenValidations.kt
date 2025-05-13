@@ -17,31 +17,35 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.jose.RFC7519
 import kotlinx.datetime.Instant
+import kotlin.time.Duration
 
 public interface StatusListTokenValidations {
 
     public fun StatusListTokenClaims.ensureValid(
         expectedSubject: String,
         validationTime: Instant,
+        allowedClockSkew: Duration,
     ): StatusListTokenClaims =
         apply {
             ensureSubject(expectedSubject)
-            ensureIssuedBefore(validationTime)
-            ensureNotExpired(validationTime)
+            ensureIssuedBefore(validationTime, allowedClockSkew)
+            ensureNotExpired(validationTime, allowedClockSkew)
         }
 
-    public fun StatusListTokenClaims.ensureIssuedBefore(validationTime: Instant): StatusListTokenClaims =
+    public fun StatusListTokenClaims.ensureIssuedBefore(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims =
         apply {
-            check(issuedAt <= validationTime) {
-                "Status list token issued ($issuedAt) after validation time: $validationTime"
+            val adjustedValidationTime = validationTime + allowedClockSkew
+            check(issuedAt <= adjustedValidationTime) {
+                "Status list token issued ($issuedAt) after validation time: $validationTime (with clock skew: $allowedClockSkew)"
             }
         }
 
-    public fun StatusListTokenClaims.ensureNotExpired(validationTime: Instant): StatusListTokenClaims =
+    public fun StatusListTokenClaims.ensureNotExpired(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims =
         apply {
             if (expirationTime != null) {
-                check(expirationTime >= validationTime) {
-                    "Status list token expired ($expirationTime) for validation time: $validationTime"
+                val adjustedValidationTime = validationTime - allowedClockSkew
+                check(expirationTime >= adjustedValidationTime) {
+                    "Status list token expired ($expirationTime) for validation time: $validationTime (with clock skew: $allowedClockSkew)"
                 }
             }
         }

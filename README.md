@@ -105,7 +105,8 @@ val getStatusListToken: GetStatusListToken = GetStatusListToken.usingJwt(
             // Configure your HTTP client here
         }
     },
-    verifyStatusListTokenSignature = VerifyStatusListTokenSignature.Ignore // Not for production
+    verifyStatusListTokenSignature = VerifyStatusListTokenSignature.Ignore, // Not for production
+    allowedClockSkew = 5.minutes // Allow 5 minutes of clock skew (requires import: kotlin.time.Duration.Companion.minutes)
 )
 
 // Use the GetStatusListToken instance to fetch a status list token
@@ -121,7 +122,7 @@ println("Status list token claims: $claims")
 > ecosystems define their own processing rules. For this reason, you need to provide an implementation
 > of [VerifyStatusListTokenSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt).
 > This will be used to verify the signature of the Status List Token after it has been fetched.
- 
+
 ### Read a Status List
 
 As a `Relying Party` be able to read a `Status List` at a specific index.
@@ -207,4 +208,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-

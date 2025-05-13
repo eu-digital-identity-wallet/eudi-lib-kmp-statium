@@ -24,6 +24,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 import kotlin.use
 
 public fun interface GetStatusListToken {
@@ -38,7 +39,8 @@ public fun interface GetStatusListToken {
             clock: Clock,
             httpClientFactory: () -> HttpClient,
             verifyStatusListTokenSignature: VerifyStatusListTokenSignature,
-        ): GetStatusListToken = GetStatusListTokenUsingJwt(clock, httpClientFactory, verifyStatusListTokenSignature)
+            allowedClockSkew: Duration = Duration.ZERO,
+        ): GetStatusListToken = GetStatusListTokenUsingJwt(clock, httpClientFactory, verifyStatusListTokenSignature, allowedClockSkew)
     }
 }
 
@@ -46,7 +48,12 @@ internal class GetStatusListTokenUsingJwt(
     private val clock: Clock,
     private val httpClientFactory: () -> HttpClient,
     private val verifySignature: VerifyStatusListTokenSignature,
+    private val allowedClockSkew: Duration,
 ) : GetStatusListToken, GetStatusListTokenKtorOps, StatusListTokenValidations {
+
+    init {
+        require(allowedClockSkew >= Duration.ZERO) { "allowedClockSkew must be >= 0" }
+    }
 
     override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> =
         runCatching {
@@ -55,7 +62,7 @@ internal class GetStatusListTokenUsingJwt(
             verifySignature(unverifiedJwt, validationTime)
             val (header, claims) = parse(unverifiedJwt)
             header.ensureTypeIsStatusListJwt()
-            claims.ensureValid(expectedSubject = uri, validationTime)
+            claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
         }
 
     private suspend fun fetchToken(uri: String, at: Instant?): String =
