@@ -9,7 +9,7 @@ ktor = "3.0.1"
 maven-publish = "0.32.0"
 spotless = "7.0.2"
 ktlint = "1.2.1"
-dependency-check = "9.0.9"
+dependency-check = "12.1.1"
 kover = "0.9.1"
 dokka = "1.9.20"
 
