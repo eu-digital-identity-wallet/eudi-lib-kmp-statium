@@ -15,6 +15,7 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
+import eu.europa.ec.eudi.statium.platformDecompress
 import io.ktor.util.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -26,7 +27,7 @@ class IOSDecompressTest {
     fun decompress_whenGivenTwoByteBase64_shouldReturnExpectedByteArray() = runTest {
         val originalData = "eNrbuRgAAhcBXQ".decodeBase64Bytes()
 
-        val decompress = IOSDecompress()
+        val decompress = platformDecompress()
         val compressedData = decompress(originalData)
 
         // Verify the decompressed data matches the original
@@ -37,7 +38,7 @@ class IOSDecompressTest {
     fun decompress_whenGivenThreeByteBase64_shouldReturnExpectedByteArray() = runTest {
         val originalData = "eNo76fITAAPfAgc".decodeBase64Bytes()
 
-        val decompress = IOSDecompress()
+        val decompress = platformDecompress()
         val compressedData = decompress(originalData)
 
         // Verify the decompressed data matches the original
