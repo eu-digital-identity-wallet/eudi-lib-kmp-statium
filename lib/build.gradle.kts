@@ -4,8 +4,8 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.net.URI
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)

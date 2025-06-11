@@ -47,14 +47,13 @@ public class IOSDecompress : Decompress {
         val result = data.usePinned { inputPinned ->
             destinationBuffer.usePinned { outputPinned ->
                 memScoped {
-
                     destinationLengthVar.value = destinationLength
 
                     uncompress(
                         outputPinned.addressOf(0).reinterpret(),
                         destinationLengthVar.ptr,
                         inputPinned.addressOf(0).reinterpret(),
-                        data.size.convert()
+                        data.size.convert(),
                     )
                 }
             }
