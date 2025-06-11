@@ -16,6 +16,7 @@
 package eu.europa.ec.eudi.statium
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.IOSDecompress
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
 internal actual fun platformDecompress(context: CoroutineContext): Decompress = IOSDecompress()
@@ -23,6 +24,4 @@ internal actual fun platformDecompress(context: CoroutineContext): Decompress = 
 /**
  * Returns a platform-specific CoroutineContext suitable for IO operations
  */
-internal actual fun platformIoContext(): CoroutineContext {
-    TODO("Not implemented")
-}
+internal actual fun platformIoContext(): CoroutineContext = Dispatchers.Default

@@ -20,10 +20,10 @@ import kotlinx.cinterop.*
 import platform.zlib.*
 
 /**
- * Implementation of [Decompress] for JVM and Android platforms using Java's built-in
+ * Implementation of [Decompress] for Apple platforms using the built-in
  * zip utilities.
  */
-internal class IOSDecompress : Decompress {
+public class IOSDecompress : Decompress {
     /**
      * Decompresses the given byte array using ZLIB/DEFLATE.
      *
