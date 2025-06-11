@@ -12,12 +12,13 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 * [Disclaimer](#disclaimer)
 * [Installation](#installation)
 * [Use cases supported](#use-cases-supported)
+* [iOS usage](#ios-usage)
 * [How to contribute](#how-to-contribute)
 * [License](#license) 
 
 ## Overview
 
-Statium is a Kotlin multiplatform library supporting JVM and Android platforms. 
+Statium is a Kotlin multiplatform library supporting JVM, Android and iOS platforms. 
 It implements the Token Status List Specification [draft 10](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-10.html), 
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
@@ -68,6 +69,13 @@ dependencies {
     implementation("eu.europa.ec.eudi:eudi-lib-kmp-statium-android:$statium_ver")
 }
 ```
+
+### iOS Project
+
+Run `./gradlew :lib:assembleXCFramework`
+If successful, get the generated `lib.xcframework` file from the output directory listed in the terminal after running the above command.
+
+In you xcode project add `lib.xcframework`
 
 ### Ktor
 
@@ -183,6 +191,55 @@ when (status) {
     Status.Suspended -> println("Token is suspended")
     is Status.ApplicationSpecific -> println("Application-specific status: ${status.value}")
     is Status.Reserved -> println("Reserved status: ${status.value}")
+}
+```
+
+## iOS usage
+
+After following the iOS installation instructions above, here is how you can use the library in Swift:
+
+```swift
+
+class DatetimeClock: Kotlinx_datetimeClock {
+  func now() -> Kotlinx_datetimeInstant {
+    let nowInMilliseconds = Int64(Date().timeIntervalSince1970 * 1000)
+    return Kotlinx_datetimeInstant.Companion.shared.fromEpochMilliseconds(
+      epochMilliseconds: nowInMilliseconds
+    )
+  }
+}
+
+let index: Int32 = ...
+let url = ...
+
+let reference: StatusReference = .init(
+  index: index,
+  uri: url
+)
+  
+let token = GetStatusListTokenCompanion()
+  .usingJwt(
+    clock: DatetimeClock(),
+    httpClientFactory: { IOSClient().getClient() },
+    verifyStatusListTokenSignature: VerifyStatusListTokenSignatureCompanion.shared.Ignore,
+    allowedClockSkew: .zero
+)
+  
+let status = GetStatusCompanion.shared.invoke(
+  getStatusListToken: token,
+  decompress: IOSDecompress()
+)
+
+let nowInMilliseconds = Int64(Date().timeIntervalSince1970 * 1000) 
+
+status.status(
+  reference,
+  at: Kotlinx_datetimeInstant.Companion.shared.fromEpochMilliseconds(
+      epochMilliseconds: nowInMilliseconds
+    )
+) { status, error in
+
+    print(status)
 }
 ```
 
