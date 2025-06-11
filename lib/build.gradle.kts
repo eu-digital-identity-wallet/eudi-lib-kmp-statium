@@ -5,6 +5,7 @@ import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -43,9 +44,18 @@ kotlin {
     // JVM target
     jvm()
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    val iosX64 = iosX64()
+    val iosArm64 = iosArm64()
+    val iosSimArm64 = iosSimulatorArm64()
+
+    val xcFramework = XCFramework()
+
+    listOf(iosX64, iosArm64, iosSimArm64).forEach {
+        it.binaries.framework {
+            baseName = "lib"
+            xcFramework.add(this)
+        }
+    }
 
     // Android target
     androidTarget {
@@ -109,6 +119,12 @@ kotlin {
         androidUnitTest {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+            }
+        }
+
+        iosMain {
+            dependencies {
+                implementation(libs.ktor.client.darwin)
             }
         }
     }
