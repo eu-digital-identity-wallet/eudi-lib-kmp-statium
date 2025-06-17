@@ -200,46 +200,23 @@ After following the iOS installation instructions above, here is how you can use
 
 ```swift
 
-class DatetimeClock: Kotlinx_datetimeClock {
-  func now() -> Kotlinx_datetimeInstant {
-    let nowInMilliseconds = Int64(Date().timeIntervalSince1970 * 1000)
-    return Kotlinx_datetimeInstant.Companion.shared.fromEpochMilliseconds(
-      epochMilliseconds: nowInMilliseconds
-    )
+let checker = StatusChecker()
+let reference = StatusReference(
+  index: ...,
+  uri: ...
+)
+
+let atISOTime = "2025-07-27T13:02:23Z"
+  
+checker.checkStatus(
+  statusReference: reference,
+  atTime: atISOTime
+) { result in
+  if let success = result as? StatusCheckResult.Success {
+  
+  } else if let failure = result as? StatusCheckResult.Failure {
+    
   }
-}
-
-let index: Int32 = ...
-let url = ...
-
-let reference: StatusReference = .init(
-  index: index,
-  uri: url
-)
-  
-let token = GetStatusListTokenCompanion()
-  .usingJwt(
-    clock: DatetimeClock(),
-    httpClientFactory: { IOSClient().getClient() },
-    verifyStatusListTokenSignature: VerifyStatusListTokenSignatureCompanion.shared.Ignore,
-    allowedClockSkew: .zero
-)
-  
-let status = GetStatusCompanion.shared.invoke(
-  getStatusListToken: token,
-  decompress: IOSDecompress()
-)
-
-let nowInMilliseconds = Int64(Date().timeIntervalSince1970 * 1000) 
-
-status.status(
-  reference,
-  at: Kotlinx_datetimeInstant.Companion.shared.fromEpochMilliseconds(
-      epochMilliseconds: nowInMilliseconds
-    )
-) { status, error in
-
-    print(status)
 }
 ```
 
