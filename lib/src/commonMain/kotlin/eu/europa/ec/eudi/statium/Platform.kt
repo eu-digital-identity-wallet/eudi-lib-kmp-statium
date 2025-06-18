@@ -32,3 +32,5 @@ internal expect fun platformDecompress(context: CoroutineContext): Decompress
  * Creates a platform-specific Decompress implementation with the default IO context
  */
 internal fun platformDecompress(): Decompress = platformDecompress(platformIoContext())
+
+public expect fun platformNonFatal(throwable: Throwable): Boolean

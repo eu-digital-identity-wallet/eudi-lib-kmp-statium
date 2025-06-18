@@ -16,6 +16,7 @@
 package eu.europa.ec.eudi.statium
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.IOSDecompress
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
@@ -25,3 +26,9 @@ internal actual fun platformDecompress(context: CoroutineContext): Decompress = 
  * Returns a platform-specific CoroutineContext suitable for IO operations
  */
 internal actual fun platformIoContext(): CoroutineContext = Dispatchers.Default
+
+public actual fun platformNonFatal(throwable: Throwable): Boolean =
+    when (throwable) {
+        is CancellationException -> false
+        else -> true
+    }
