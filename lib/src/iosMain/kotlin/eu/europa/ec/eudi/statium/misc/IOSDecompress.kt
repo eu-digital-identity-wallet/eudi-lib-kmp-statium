@@ -83,7 +83,6 @@ public class IOSDecompress : Decompress {
     }
 }
 
-
 public class ByteArrayOutput {
     private var buffer = ByteArray(1024)
     private var size = 0
