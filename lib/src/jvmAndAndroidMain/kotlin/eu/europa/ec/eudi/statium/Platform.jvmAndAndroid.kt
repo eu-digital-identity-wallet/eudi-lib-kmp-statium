@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.JvmAndroidDecompress
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -33,3 +34,5 @@ public actual fun platformNonFatal(throwable: Throwable): Boolean =
         is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError, is CancellationException -> false
         else -> true
     }
+
+internal actual fun platformHttpClient(): HttpClient = HttpClient()

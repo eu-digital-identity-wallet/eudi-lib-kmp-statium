@@ -16,6 +16,8 @@
 package eu.europa.ec.eudi.statium
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.IOSDecompress
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.darwin.Darwin
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -32,3 +34,5 @@ public actual fun platformNonFatal(throwable: Throwable): Boolean =
         is CancellationException -> false
         else -> true
     }
+
+internal actual fun platformHttpClient(): HttpClient = HttpClient(Darwin)
