@@ -489,7 +489,7 @@ class ReadStatusTestVectors {
 
     private fun doTestReadStatus(tv: TestVector) =
         runTest {
-            val decompress = platformDecompress(coroutineContext)
+            val decompress = platformDecompress()
             val readStatus = ReadStatus.fromStatusList(tv.statusList, decompress).getOrThrow()
             tv.expectedStatuses.forEach { (index, expectedStatus) ->
                 val actualStatus = readStatus(index).getOrThrow()

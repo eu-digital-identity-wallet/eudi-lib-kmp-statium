@@ -32,38 +32,74 @@ public class IOSDecompress : Decompress {
      * @throws Exception if decompression fails
      */
     override suspend fun invoke(bytes: CompressedByteArray): ByteArray {
-        val (len, buffer) = decompressGzip(bytes)
-        val clampedBuffer = buffer.copyOf(len.coerceAtMost(buffer.size))
-        return clampedBuffer
+        val buffer = decompressZlib(bytes) ?: throw IllegalArgumentException("Failed to decompress: input may not be valid ZLIB format")
+        return buffer
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    internal fun decompressGzip(data: ByteArray): Pair<Int, ByteArray> = memScoped {
-        // Estimate a reasonable buffer size; adjust as needed
-        val destinationLength = 1024UL * 8UL
-        val destinationBuffer = ByteArray(destinationLength.toInt())
+    public fun decompressZlib(data: ByteArray): ByteArray? = memScoped {
+        if (data.isEmpty()) return null
 
-        val destinationLengthVar = alloc<ULongVar>()
-        val result = data.usePinned { inputPinned ->
-            destinationBuffer.usePinned { outputPinned ->
-                memScoped {
-                    destinationLengthVar.value = destinationLength
+        val strm = alloc<z_stream>().apply {
+            zalloc = null
+            zfree = null
+            opaque = null
+            avail_in = data.size.toUInt()
+            next_in = data.refTo(0).getPointer(this@memScoped).reinterpret()
+        }
 
-                    uncompress(
-                        outputPinned.addressOf(0).reinterpret(),
-                        destinationLengthVar.ptr,
-                        inputPinned.addressOf(0).reinterpret(),
-                        data.size.convert(),
-                    )
+        // Use ZLIB header (15), not GZIP (15 + 16), not raw deflate (-15)
+        if (inflateInit2_(strm.ptr, 15, ZLIB_VERSION, sizeOf<z_stream>().toInt()) != Z_OK) {
+            return null
+        }
+
+        val out = ByteArrayOutput()
+        val bufferSize = 16 * 1024
+        val buffer = ByteArray(bufferSize)
+
+        try {
+            while (true) {
+                strm.next_out = buffer.refTo(0).getPointer(this).reinterpret()
+                strm.avail_out = buffer.size.toUInt()
+
+                val result = inflate(strm.ptr, Z_NO_FLUSH)
+
+                val bytesDecompressed = bufferSize - strm.avail_out.toInt()
+                if (bytesDecompressed > 0) {
+                    out.write(buffer, 0, bytesDecompressed)
+                }
+
+                when (result) {
+                    Z_STREAM_END -> break
+                    Z_OK -> continue
+                    else -> return null // Error in stream
                 }
             }
+        } finally {
+            inflateEnd(strm.ptr)
         }
 
-        if (result != Z_OK) {
-            throw RuntimeException("Decompression failed with zlib error code: $result")
-        }
+        return out.toByteArray()
+    }
+}
 
-        // Return only the decompressed portion
-        return destinationLengthVar.value.toInt() to destinationBuffer.copyOf(destinationLength.toInt())
+
+public class ByteArrayOutput {
+    private var buffer = ByteArray(1024)
+    private var size = 0
+
+    public fun write(src: ByteArray, offset: Int, length: Int) {
+        ensureCapacity(size + length)
+        src.copyInto(buffer, destinationOffset = size, startIndex = offset, endIndex = offset + length)
+        size += length
+    }
+
+    public fun toByteArray(): ByteArray = buffer.copyOf(size)
+
+    private fun ensureCapacity(required: Int) {
+        if (required > buffer.size) {
+            val newSize = maxOf(buffer.size * 2, required)
+            buffer = buffer.copyOf(newSize)
+        }
     }
 }
