@@ -20,6 +20,7 @@ import eu.europa.ec.eudi.statium.misc.Base64UrlNoPadding
 import eu.europa.ec.eudi.statium.misc.BitsPerStatusSerializer
 import eu.europa.ec.eudi.statium.misc.EpocSecondsSerializer
 import eu.europa.ec.eudi.statium.misc.StatiumJsonSerializersModule
+import eu.europa.ec.eudi.statium.misc.resultOf
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
@@ -135,7 +136,7 @@ public data class StatusList(
             base64UrlEncodedList: String,
             aggregationUri: String? = null,
         ): Result<StatusList> =
-            runCatching {
+            resultOf {
                 val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
                 StatusList(bytesPerStatus, compressedList, aggregationUri)
             }
