@@ -20,6 +20,7 @@ import eu.europa.ec.eudi.statium.misc.Base64UrlNoPadding
 import eu.europa.ec.eudi.statium.misc.BitsPerStatusSerializer
 import eu.europa.ec.eudi.statium.misc.EpocSecondsSerializer
 import eu.europa.ec.eudi.statium.misc.StatiumJsonSerializersModule
+import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
@@ -134,7 +135,7 @@ public data class StatusList(
             base64UrlEncodedList: String,
             aggregationUri: String? = null,
         ): Result<StatusList> =
-            runCatching {
+            runCatchingCancellable {
                 val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
                 StatusList(bytesPerStatus, compressedList, aggregationUri)
             }
@@ -289,7 +290,7 @@ public sealed interface Status : Comparable<Status> {
          * @param bitsPerStatus the number of bits for representing the status
          * @param statusValue the value of the status
          */
-        public operator fun invoke(bitsPerStatus: BitsPerStatus, statusValue: UByte): Result<Status> = runCatching {
+        public operator fun invoke(bitsPerStatus: BitsPerStatus, statusValue: UByte): Result<Status> = runCatchingCancellable {
             val maxValue: UByte = when (bitsPerStatus) {
                 BitsPerStatus.One -> 1u
                 BitsPerStatus.Two -> 3u

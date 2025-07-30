@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium.http
 
 import eu.europa.ec.eudi.statium.StatusListTokenFormat
 import eu.europa.ec.eudi.statium.TokenStatusListSpec
+import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -34,7 +35,7 @@ public interface GetStatusListTokenKtorOps {
         format: StatusListTokenFormat,
         at: Instant?,
     ): Result<String> =
-        runCatching {
+        runCatchingCancellable {
             val httpResponse = get(uri) {
                 accept(format.contentType())
                 at?.let { parameter(TokenStatusListSpec.TIME, it.epochSeconds) }

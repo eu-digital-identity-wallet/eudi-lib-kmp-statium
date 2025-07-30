@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.http.GetStatusListTokenKtorOps
 import eu.europa.ec.eudi.statium.jose.jwtHeaderAndPayload
+import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import io.ktor.client.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -54,7 +55,7 @@ internal class GetStatusListTokenUsingJwt(
     }
 
     override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> =
-        runCatching {
+        runCatchingCancellable {
             val unverifiedJwt = fetchToken(uri, at)
             val validationTime = at ?: clock.now()
             verifySignature(unverifiedJwt, validationTime)
