@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.BitsPerStatus.*
 import eu.europa.ec.eudi.statium.misc.Decompress
+import eu.europa.ec.eudi.statium.misc.resultOf
 
 /**
  * Reads a status at a specific [index][StatusIndex]
@@ -33,7 +34,7 @@ public fun interface ReadStatus {
          */
         public fun fromByteArray(bitsPerStatus: BitsPerStatus, statusList: ByteArray): ReadStatus =
             ReadStatus { index ->
-                runCatching {
+                resultOf {
                     with(bitsPerStatus) {
                         val (bytePosition, bitPosition) = byteAndBitPosition(index)
                         val byte = statusList[bytePosition]
@@ -49,7 +50,7 @@ public fun interface ReadStatus {
             statusList: StatusList,
             decompress: Decompress = platformDecompress(),
         ): Result<ReadStatus> =
-            runCatching {
+            resultOf {
                 val decompressedList = decompress(statusList.compressedList)
                 fromByteArray(statusList.bytesPerStatus, decompressedList)
             }

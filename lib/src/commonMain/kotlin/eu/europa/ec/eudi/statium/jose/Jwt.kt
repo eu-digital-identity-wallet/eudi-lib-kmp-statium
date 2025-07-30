@@ -17,12 +17,13 @@ package eu.europa.ec.eudi.statium.jose
 
 import eu.europa.ec.eudi.statium.misc.Base64UrlNoPadding
 import eu.europa.ec.eudi.statium.misc.StatiumJson
+import eu.europa.ec.eudi.statium.misc.resultOf
 import kotlinx.io.Buffer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 
 internal inline fun <reified H, reified P> jwtHeaderAndPayload(jwt: String): Result<Pair<H, P>> =
-    runCatching {
+    resultOf {
         val (headerPart, payloadPart, _) = parts(jwt)
         with(StatiumJson) {
             val header = decodeBase64<H>(headerPart)

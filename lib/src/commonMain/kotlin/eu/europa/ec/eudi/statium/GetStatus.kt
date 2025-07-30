@@ -16,6 +16,7 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
+import eu.europa.ec.eudi.statium.misc.resultOf
 import kotlinx.datetime.Instant
 
 /**
@@ -58,7 +59,7 @@ public fun interface GetStatus {
             getStatusListToken: GetStatusListToken,
             decompress: Decompress = platformDecompress(),
         ): GetStatus = GetStatus { at ->
-            runCatching {
+            resultOf {
                 val statusListTokenClaims = getStatusListToken(uri, at).getOrThrow()
                 val statusList = statusListTokenClaims.statusList
                 val readStatus = ReadStatus.fromStatusList(statusList, decompress).getOrThrow()

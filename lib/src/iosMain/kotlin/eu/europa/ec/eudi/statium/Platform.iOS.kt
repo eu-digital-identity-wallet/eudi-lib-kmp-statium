@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 package eu.europa.ec.eudi.statium
-
 import eu.europa.ec.eudi.statium.misc.Decompress
-import eu.europa.ec.eudi.statium.misc.JvmAndroidDecompress
+import eu.europa.ec.eudi.statium.misc.IOSDecompress
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.darwin.Darwin
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-internal actual fun platformIoContext(): CoroutineContext = Dispatchers.IO
+internal actual fun platformDecompress(context: CoroutineContext): Decompress = IOSDecompress()
 
-internal actual fun platformDecompress(context: CoroutineContext): Decompress = JvmAndroidDecompress(context)
+/**
+ * Returns a platform-specific CoroutineContext suitable for IO operations
+ */
+internal actual fun platformIoContext(): CoroutineContext = Dispatchers.Default
 
-//
-// From https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core/src/androidAndJvmMain/kotlin/arrow/core/NonFatal.kt
-//
 public actual fun platformNonFatal(throwable: Throwable): Boolean =
     when (throwable) {
-        is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError, is CancellationException -> false
+        is CancellationException -> false
         else -> true
     }
 
-internal actual fun platformHttpClient(): HttpClient = HttpClient()
+internal actual fun platformHttpClient(): HttpClient = HttpClient(Darwin)

@@ -16,6 +16,7 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
+import io.ktor.client.HttpClient
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -32,3 +33,10 @@ internal expect fun platformDecompress(context: CoroutineContext): Decompress
  * Creates a platform-specific Decompress implementation with the default IO context
  */
 internal fun platformDecompress(): Decompress = platformDecompress(platformIoContext())
+
+public expect fun platformNonFatal(throwable: Throwable): Boolean
+
+/**
+ * Creates a platform-specific http client
+ */
+internal expect fun platformHttpClient(): HttpClient
