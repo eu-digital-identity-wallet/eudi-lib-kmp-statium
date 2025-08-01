@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.BitsPerStatus.*
 import eu.europa.ec.eudi.statium.misc.Decompress
+import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 
 /**
  * Reads a status at a specific [index][StatusIndex]
@@ -33,7 +34,7 @@ public fun interface ReadStatus {
          */
         public fun fromByteArray(bitsPerStatus: BitsPerStatus, statusList: ByteArray): ReadStatus =
             ReadStatus { index ->
-                runCatching {
+                runCatchingCancellable {
                     with(bitsPerStatus) {
                         val (bytePosition, bitPosition) = byteAndBitPosition(index)
                         val byte = statusList[bytePosition]
@@ -49,7 +50,7 @@ public fun interface ReadStatus {
             statusList: StatusList,
             decompress: Decompress = platformDecompress(),
         ): Result<ReadStatus> =
-            runCatching {
+            runCatchingCancellable {
                 val decompressedList = decompress(statusList.compressedList)
                 fromByteArray(statusList.bytesPerStatus, decompressedList)
             }
@@ -88,7 +89,7 @@ public fun BitsPerStatus.byteAndBitPosition(index: StatusIndex): Pair<Int, Int> 
  *
  * @return the status read
  */
-public fun BitsPerStatus.readStatusByte(statusByte: Byte, bitPosition: Int): Result<Status> = runCatching {
+public fun BitsPerStatus.readStatusByte(statusByte: Byte, bitPosition: Int): Result<Status> = runCatchingCancellable {
     require(bitPosition in 0..<BitsPerStatus.BITS_PER_BYTE) {
         "Bit position should be in range [0,${BitsPerStatus.BITS_PER_BYTE})"
     }
