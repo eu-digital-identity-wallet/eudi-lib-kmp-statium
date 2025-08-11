@@ -33,6 +33,7 @@ kotlin {
                 "kotlinx.serialization.ExperimentalSerializationApi",
                 "kotlin.io.encoding.ExperimentalEncodingApi",
                 "kotlin.ExperimentalStdlibApi",
+                "kotlin.time.ExperimentalTime",
             )
         freeCompilerArgs =
             listOf(

@@ -21,12 +21,12 @@ import eu.europa.ec.eudi.statium.misc.BitsPerStatusSerializer
 import eu.europa.ec.eudi.statium.misc.EpocSecondsSerializer
 import eu.europa.ec.eudi.statium.misc.StatiumJsonSerializersModule
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 /**
  * Represents the number of [bits] for a status.

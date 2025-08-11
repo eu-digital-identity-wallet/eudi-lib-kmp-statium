@@ -15,11 +15,11 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class EpocSecondsSerializerTest {
 

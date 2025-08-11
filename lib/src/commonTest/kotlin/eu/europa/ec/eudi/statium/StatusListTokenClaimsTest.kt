@@ -16,13 +16,13 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.StatiumJson
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 class StatusListTokenClaimsTest {
 

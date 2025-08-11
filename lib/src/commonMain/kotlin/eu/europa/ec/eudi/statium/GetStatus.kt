@@ -17,7 +17,7 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Allows the caller to get the status of a [`status_list`][StatusReference],

@@ -16,8 +16,8 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.jose.RFC7519
-import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 public interface StatusListTokenValidations {
 
