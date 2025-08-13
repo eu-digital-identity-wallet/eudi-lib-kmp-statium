@@ -100,11 +100,7 @@ Library provides for this use case the interface [GetStatusListToken](lib/src/co
 // Create an instance of GetStatusListToken using the usingJwt factory method
 val getStatusListToken: GetStatusListToken = GetStatusListToken.usingJwt(
     clock = Clock.System,
-    httpClientFactory = {
-        HttpClient {
-            // Configure your HTTP client here
-        }
-    },
+    httpClient = HttpClient(), // Just an example, remember to close the client when you're done!
     verifyStatusListTokenSignature = VerifyStatusListTokenSignature.Ignore, // Not for production
     allowedClockSkew = 5.minutes // Allow 5 minutes of clock skew (requires import: kotlin.time.Duration.Companion.minutes)
 )

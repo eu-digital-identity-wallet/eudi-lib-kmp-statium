@@ -18,7 +18,7 @@ package eu.europa.ec.eudi.statium
 import eu.europa.ec.eudi.statium.http.GetStatusListTokenKtorOps
 import eu.europa.ec.eudi.statium.jose.jwtHeaderAndPayload
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Required
@@ -36,16 +36,16 @@ public fun interface GetStatusListToken {
          */
         public fun usingJwt(
             clock: Clock,
-            httpClientFactory: () -> HttpClient,
+            httpClient: HttpClient,
             verifyStatusListTokenSignature: VerifyStatusListTokenSignature,
             allowedClockSkew: Duration = Duration.ZERO,
-        ): GetStatusListToken = GetStatusListTokenUsingJwt(clock, httpClientFactory, verifyStatusListTokenSignature, allowedClockSkew)
+        ): GetStatusListToken = GetStatusListTokenUsingJwt(clock, httpClient, verifyStatusListTokenSignature, allowedClockSkew)
     }
 }
 
 internal class GetStatusListTokenUsingJwt(
     private val clock: Clock,
-    private val httpClientFactory: () -> HttpClient,
+    private val httpClient: HttpClient,
     private val verifySignature: VerifyStatusListTokenSignature,
     private val allowedClockSkew: Duration,
 ) : GetStatusListToken, GetStatusListTokenKtorOps, StatusListTokenValidations {
@@ -65,9 +65,8 @@ internal class GetStatusListTokenUsingJwt(
         }
 
     private suspend fun fetchToken(uri: String, at: Instant?): String =
-        httpClientFactory().use { httpClient ->
-            httpClient.getStatusListToken(uri, StatusListTokenFormat.JWT, at).getOrThrow()
-        }
+        httpClient.getStatusListToken(uri, StatusListTokenFormat.JWT, at).getOrThrow()
+
     private suspend fun verifySignature(unverifiedJwt: String, verificationTime: Instant) {
         verifySignature(unverifiedJwt, StatusListTokenFormat.JWT, verificationTime)
             .getOrElse { error -> throw IllegalStateException("Invalid JWT signature", error) }
