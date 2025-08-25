@@ -44,15 +44,17 @@ fun Clock.Companion.fixed(at: Instant): Clock = object : Clock {
 }
 
 private fun doTest(expectedStatus: Status, statusReference: StatusReference, clock: Clock = Clock.System) = runTest {
-    with(getStatus(clock) { HttpClient() }) {
-        val status = statusReference.status(at = null).getOrThrow()
-        assertEquals(expectedStatus, status)
+    HttpClient().use { httpClient ->
+        with(getStatus(clock, httpClient)) {
+            val status = statusReference.status(at = null).getOrThrow()
+            assertEquals(expectedStatus, status)
+        }
     }
 }
 
-private fun CoroutineScope.getStatus(clock: Clock, httpClientFactory: () -> HttpClient): GetStatus {
+private fun CoroutineScope.getStatus(clock: Clock, httpClient: HttpClient): GetStatus {
     val verifySignature = VerifyStatusListTokenSignature.Ignore
-    val getStatusListToken = GetStatusListToken.usingJwt(clock, httpClientFactory, verifySignature, kotlin.time.Duration.ZERO)
+    val getStatusListToken = GetStatusListToken.usingJwt(clock, httpClient, verifySignature, kotlin.time.Duration.ZERO)
     val decompress = platformDecompress(coroutineContext)
     return GetStatus(getStatusListToken, decompress)
 }
