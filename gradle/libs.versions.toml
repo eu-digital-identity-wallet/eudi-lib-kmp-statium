@@ -1,6 +1,6 @@
 [versions]
 java = "17"
-kotlin = "2.2.0"
+kotlin = "2.1.21"
 android-library = "8.5.2"
 kotlinx-serialization = "1.8.0"
 kotlinx-datetime = "0.7.1"
