@@ -80,7 +80,6 @@ kotlin {
                 // Common dependencies
                 api(libs.kotlinx.serialization.core)
                 api(libs.kotlinx.serialization.json)
-                api(libs.kotlinx.datetime)
                 api(libs.kotlinx.coroutines.core)
                 api(libs.ktor.client.core)
                 implementation(libs.ktor.client.serialization)
