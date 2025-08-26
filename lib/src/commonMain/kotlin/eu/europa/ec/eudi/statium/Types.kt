@@ -208,8 +208,8 @@ public constructor(
     @CborLabel(RFC8392.SUBJECT) @SerialName(RFC7519.SUBJECT) @Required val subject: String,
     @CborLabel(RFC8392.ISSUED_AT) @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
     @CborLabel(RFC8392.EXPIRATION_TIME) @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
-    @CborLabel(65534) @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
-    @CborLabel(65533) @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
+    @CborLabel(TokenStatusListSpec.TIME_TO_LIVE_COSE) @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
+    @CborLabel(TokenStatusListSpec.STATUS_LIST_COSE) @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
 ) {
     init {
         require(subject.isNotBlank()) { "The subject must not be empty." }
