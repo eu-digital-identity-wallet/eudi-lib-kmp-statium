@@ -19,12 +19,12 @@ import eu.europa.ec.eudi.statium.http.GetStatusListTokenKtorOps
 import eu.europa.ec.eudi.statium.jose.jwtHeaderAndPayload
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import io.ktor.client.HttpClient
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 public fun interface GetStatusListToken {
 
