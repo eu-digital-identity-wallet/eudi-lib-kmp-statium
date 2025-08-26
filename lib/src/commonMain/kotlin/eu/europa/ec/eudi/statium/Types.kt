@@ -50,12 +50,11 @@ public enum class BitsPerStatus(public val bits: Int) {
         internal const val BITS_PER_BYTE = 8
 
         /**
-         * Gets a [BitsPerStatus]
-         * given the number of [bits]
+         * Attempts to get aa [BitsPerStatus], given the number of [bits]
+         * @param bits number of bits
+         * @return the [BitsPerStatus] or null
          */
-        public fun forBits(bits: Int): BitsPerStatus? {
-            return BitsPerStatus.entries.find { it.bits == bits }
-        }
+        public fun fromBitsOrNull(bits: Int): BitsPerStatus? = BitsPerStatus.entries.find { it.bits == bits }
     }
 }
 

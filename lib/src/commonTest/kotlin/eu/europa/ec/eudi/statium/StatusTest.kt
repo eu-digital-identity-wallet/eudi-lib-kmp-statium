@@ -32,7 +32,7 @@ class StatusTest {
             // Return STATUS_APPLICATION_SPECIFIC (0x03)
             TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC
         } else {
-            // Return a random value in the application specific range (0x0B..0x0F)
+            // Return a random value in the application-specific range (0x0B..0x0F)
             val rangeStart = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START.toInt()
             val rangeEnd = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END.toInt()
             Random.nextInt(rangeStart, rangeEnd + 1).toUByte()
@@ -141,7 +141,7 @@ class StatusTest {
         assertFalse(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_INVALID))
         assertFalse(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_SUSPENDED))
 
-        // Test values outside the application specific range
+        // Test values outside the application-specific range
         assertFalse(Status.isApplicationSpecific(0x04u))
         assertFalse(Status.isApplicationSpecific(0x0Au))
         assertFalse(Status.isApplicationSpecific(0x10u))
