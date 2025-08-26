@@ -15,16 +15,16 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.time.Instant
 
 /**
- * Serializes an [Instant] as a [Long] representing the [kotlinx.datetime.Instant.epochSeconds]
+ * Serializes an [Instant] as a [Long] representing the [Instant.epochSeconds]
  */
 internal object EpocSecondsSerializer : KSerializer<Instant> {
     override val descriptor: SerialDescriptor =

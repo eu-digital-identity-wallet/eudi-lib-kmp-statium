@@ -22,11 +22,11 @@ import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
 

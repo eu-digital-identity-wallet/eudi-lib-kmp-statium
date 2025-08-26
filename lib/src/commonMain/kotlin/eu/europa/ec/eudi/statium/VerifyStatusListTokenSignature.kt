@@ -15,7 +15,7 @@
  */
 package eu.europa.ec.eudi.statium
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Verifies the status list token signature
