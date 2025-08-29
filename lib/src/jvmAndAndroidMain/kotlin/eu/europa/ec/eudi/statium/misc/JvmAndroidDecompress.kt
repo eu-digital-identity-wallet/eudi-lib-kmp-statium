@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
 import kotlin.coroutines.CoroutineContext
 
@@ -37,11 +38,16 @@ internal class JvmAndroidDecompress(private val context: CoroutineContext = Disp
      */
     override suspend fun invoke(bytes: CompressedByteArray): ByteArray = withContext(context) {
         ByteArrayInputStream(bytes).use { inputStream ->
-            InflaterInputStream(inputStream).use { inflaterStream ->
-                ByteArrayOutputStream().use { outputStream ->
-                    inflaterStream.copyTo(outputStream)
-                    outputStream.toByteArray()
+            val inflater = Inflater(false)
+            try {
+                InflaterInputStream(inputStream, inflater).use { inflaterStream ->
+                    ByteArrayOutputStream().use { outputStream ->
+                        inflaterStream.copyTo(outputStream)
+                        outputStream.toByteArray()
+                    }
                 }
+            } finally {
+                inflater.end()
             }
         }
     }

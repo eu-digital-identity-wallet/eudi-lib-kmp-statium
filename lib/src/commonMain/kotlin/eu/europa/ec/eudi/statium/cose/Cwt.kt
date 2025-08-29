@@ -17,7 +17,6 @@ package eu.europa.ec.eudi.statium.cose
 
 import eu.europa.ec.eudi.statium.cose.ParseCwt.CoseProtectedHeaderAndPayload
 import eu.europa.ec.eudi.statium.misc.StatiumCbor
-import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.CborArray
 import kotlinx.serialization.cbor.ObjectTags
@@ -34,7 +33,7 @@ public fun interface ParseCwt<out ProtectedHeader, out Payload> {
     )
 
     public companion object {
-        public fun <PH, P> map(
+        internal fun <PH, P> map(
             protectedHeaderSerializer: kotlinx.serialization.KSerializer<PH>,
             payloadSerializer: kotlinx.serialization.KSerializer<P>,
             parseCwt: ParseCwt<ByteArray, ByteArray>,
@@ -47,26 +46,20 @@ public fun interface ParseCwt<out ProtectedHeader, out Payload> {
             }
         }
 
-        public inline fun <reified PH, reified P> map(
+        internal inline fun <reified PH, reified P> map(
             parseCwt: ParseCwt<ByteArray, ByteArray>,
         ): ParseCwt<PH, P> {
             val serializersModule = StatiumCbor.serializersModule
             return map(serializersModule.serializer(), serializersModule.serializer(), parseCwt)
         }
+
+        public fun default(): ParseCwt<ByteArray, ByteArray> = ParseCwtUsingKotlinx
+
+        internal inline fun <reified PH, reified P> mapping(): ParseCwt<PH, P> = map(default())
     }
 }
 
-internal suspend inline fun <reified PH, reified P> cwtHeaderAndPayload(input: ByteArray): Result<CoseProtectedHeaderAndPayload<PH, P>> =
-    runCatchingCancellable {
-        val (protectedHeaderBytes, payloadBytes) = ParseCwtUsingKotlinx(input)
-        with(StatiumCbor) {
-            val protectedHeader = decodeFromByteArray<PH>(protectedHeaderBytes)
-            val payload = payloadBytes?.let { decodeFromByteArray<P>(it) }
-            CoseProtectedHeaderAndPayload(protectedHeader, payload)
-        }
-    }
-
-public object ParseCwtUsingKotlinx : ParseCwt<ByteArray, ByteArray> {
+internal object ParseCwtUsingKotlinx : ParseCwt<ByteArray, ByteArray> {
 
     @Serializable
     private class CoseUnprotectedHeader()
