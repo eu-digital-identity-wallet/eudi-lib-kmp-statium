@@ -16,23 +16,16 @@
 package eu.europa.ec.eudi.statium.cose
 
 import eu.europa.ec.eudi.statium.GetStatusListTokenUsingCwt
-import eu.europa.ec.eudi.statium.StatusList
 import eu.europa.ec.eudi.statium.StatusListTokenClaims
 import eu.europa.ec.eudi.statium.TokenStatusListSpec
-import eu.europa.ec.eudi.statium.misc.StatiumCbor
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.decodeFromByteArray
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ParseCwtHeaderAndPayloadTest {
-    @Test
-    fun test() {
-        val hex = "a2646269747301636c73744a78dadbb918000217015d"
-        val statusList = StatiumCbor.decodeFromByteArray<StatusList>(hex.hexToByteArray())
-        println(statusList)
-        println(statusList.compressedList.byteArrayToUnicode())
-    }
+
+    private val parseCwt =
+        ParseCwt.mapping<GetStatusListTokenUsingCwt.ProtectedHeader, StatusListTokenClaims>()
 
     @Test
     fun testCwtUsingCoseSign1() = runTest {
@@ -45,25 +38,14 @@ class ParseCwtHeaderAndPayloadTest {
             44e3612381e0cf88f2f160b3e1f97728ec8403
         """.trimIndent().replace("\n", "").hexToByteArray()
 
-        val (protectedHeader, statusListTokenClaims) =
-            cwtHeaderAndPayload<GetStatusListTokenUsingCwt.ProtectedHeader, StatusListTokenClaims>(input).getOrThrow()
+        val (protectedHeader, statusListTokenClaims) = parseCwt(input)
 
         assertEquals(
-            GetStatusListTokenUsingCwt.ProtectedHeader(TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT),
-            protectedHeader,
+            expected = GetStatusListTokenUsingCwt.ProtectedHeader(TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT),
+            actual = protectedHeader,
         )
 
         println(protectedHeader)
         println(statusListTokenClaims)
-    }
-
-    private fun ByteArray.byteArrayToUnicode(): String {
-        return joinToString("") { byte ->
-            if (byte in 32..126) { // Printable ASCII range
-                byte.toInt().toChar().toString()
-            } else {
-                "\\u${byte.toUByte().toString(16).padStart(4, '0')}"
-            }
-        }
     }
 }

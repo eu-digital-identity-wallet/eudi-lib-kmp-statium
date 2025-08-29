@@ -16,11 +16,10 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.cose.ParseCwt
-import eu.europa.ec.eudi.statium.cose.ParseCwtUsingKotlinx
 import eu.europa.ec.eudi.statium.http.GetStatusListTokenKtorOps
 import eu.europa.ec.eudi.statium.jose.jwtHeaderAndPayload
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -41,7 +40,7 @@ public fun interface GetStatusListToken {
         public fun usingJwt(
             clock: Clock,
             httpClient: HttpClient,
-            verifyStatusListTokenSignature: VerifyStatusListTokenSignature,
+            verifyStatusListTokenSignature: VerifyStatusListTokenJwtSignature,
             allowedClockSkew: Duration = Duration.ZERO,
         ): GetStatusListToken =
             GetStatusListTokenUsingJwt(
@@ -58,8 +57,8 @@ public fun interface GetStatusListToken {
         public fun usingCwt(
             clock: Clock,
             httpClient: HttpClient,
-            verifyStatusListTokenSignature: VerifyStatusListTokenSignature,
-            parseCwt: ParseCwt<ByteArray, ByteArray> = ParseCwtUsingKotlinx,
+            verifyStatusListTokenSignature: VerifyStatusListTokenCwtSignature,
+            parseCwt: ParseCwt<ByteArray, ByteArray> = ParseCwt.default(),
             allowedClockSkew: Duration = Duration.ZERO,
         ): GetStatusListToken =
             GetStatusListTokenUsingCwt(
@@ -75,7 +74,7 @@ public fun interface GetStatusListToken {
 internal class GetStatusListTokenUsingJwt(
     private val clock: Clock,
     private val httpClient: HttpClient,
-    private val verifySignature: VerifyStatusListTokenSignature,
+    private val verifyJwtSignature: VerifyStatusListTokenJwtSignature,
     private val allowedClockSkew: Duration,
 ) : GetStatusListToken, GetStatusListTokenKtorOps, StatusListTokenValidations {
 
@@ -97,7 +96,7 @@ internal class GetStatusListTokenUsingJwt(
         httpClient.getStatusListToken(uri, StatusListTokenFormat.JWT, at).getOrThrow()
 
     private suspend fun verifySignature(unverifiedJwt: String, verificationTime: Instant) {
-        verifySignature(unverifiedJwt, StatusListTokenFormat.JWT, verificationTime)
+        verifyJwtSignature(unverifiedJwt, verificationTime)
             .getOrElse { error -> throw IllegalStateException("Invalid JWT signature", error) }
     }
 
@@ -127,7 +126,7 @@ internal class GetStatusListTokenUsingJwt(
 internal class GetStatusListTokenUsingCwt(
     private val clock: Clock,
     private val httpClient: HttpClient,
-    private val verifySignature: VerifyStatusListTokenSignature,
+    private val verifyCwtSignature: VerifyStatusListTokenCwtSignature,
     parseCwt: ParseCwt<ByteArray, ByteArray>,
     private val allowedClockSkew: Duration,
 ) : GetStatusListToken, GetStatusListTokenKtorOps, StatusListTokenValidations {
@@ -143,17 +142,20 @@ internal class GetStatusListTokenUsingCwt(
             val unverifiedCwt = fetchToken(uri, at)
             val validationTime = at ?: clock.now()
             verifySignature(unverifiedCwt, validationTime)
-            val (header, claims) = parseCwt(unverifiedCwt.encodeToByteArray())
+            val (header, claims) = parseCwt(unverifiedCwt)
             checkNotNull(claims) { "Missing claims in CWT" }
             header.ensureTypeIsStatusListCwt()
             claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
         }
 
-    private suspend fun fetchToken(uri: String, at: Instant?): String =
-        httpClient.getStatusListToken(uri, StatusListTokenFormat.CWT, at).getOrThrow()
+    private suspend fun fetchToken(uri: String, at: Instant?): ByteArray =
+        httpClient
+            .getStatusListToken(uri, StatusListTokenFormat.CWT, at)
+            .map(String::toByteArray) // TODO Check how CWT is encoded to the HTTP response
+            .getOrThrow()
 
-    private suspend fun verifySignature(unverifiedCwt: String, verificationTime: Instant) {
-        verifySignature(unverifiedCwt, StatusListTokenFormat.CWT, verificationTime)
+    private suspend fun verifySignature(unverifiedCwt: ByteArray, verificationTime: Instant) {
+        verifyCwtSignature(unverifiedCwt, verificationTime)
             .getOrElse { error -> throw IllegalStateException("Invalid CWT signature", error) }
     }
 

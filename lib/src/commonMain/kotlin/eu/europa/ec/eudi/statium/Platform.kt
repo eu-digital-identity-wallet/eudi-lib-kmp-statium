@@ -15,6 +15,7 @@
  */
 package eu.europa.ec.eudi.statium
 
+import eu.europa.ec.eudi.statium.misc.Compress
 import eu.europa.ec.eudi.statium.misc.Decompress
 import kotlin.coroutines.CoroutineContext
 
@@ -32,3 +33,7 @@ internal expect fun platformDecompress(context: CoroutineContext): Decompress
  * Creates a platform-specific Decompress implementation with the default IO context
  */
 internal fun platformDecompress(): Decompress = platformDecompress(platformIoContext())
+
+internal expect fun platformCompress(context: CoroutineContext): Compress
+
+internal fun platformCompress(): Compress = platformCompress(platformIoContext())

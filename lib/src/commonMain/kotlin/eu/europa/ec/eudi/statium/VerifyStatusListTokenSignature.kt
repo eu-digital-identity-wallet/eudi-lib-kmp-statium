@@ -30,9 +30,37 @@ public fun interface VerifyStatusListTokenSignature {
         format: StatusListTokenFormat,
         at: Instant,
     ): Result<Unit>
+}
+
+public fun interface VerifyStatusListTokenJwtSignature {
+    /**
+     * Verifies the signature of a status list at a specific [point in time][at].
+     * It raises an exception in case of invalid signature
+     */
+    public suspend operator fun invoke(
+        statusListToken: String,
+        at: Instant,
+    ): Result<Unit>
 
     public companion object {
-        public val Ignore: VerifyStatusListTokenSignature = VerifyStatusListTokenSignature { _, _, _ ->
+        internal val Ignore: VerifyStatusListTokenJwtSignature = VerifyStatusListTokenJwtSignature { _, _ ->
+            Result.success(Unit)
+        }
+    }
+}
+
+public fun interface VerifyStatusListTokenCwtSignature {
+    /**
+     * Verifies the signature of a status list at a specific [point in time][at].
+     * It raises an exception in case of invalid signature
+     */
+    public suspend operator fun invoke(
+        statusListToken: ByteArray,
+        at: Instant,
+    ): Result<Unit>
+
+    public companion object {
+        internal val Ignore: VerifyStatusListTokenCwtSignature = VerifyStatusListTokenCwtSignature { _, _ ->
             Result.success(Unit)
         }
     }

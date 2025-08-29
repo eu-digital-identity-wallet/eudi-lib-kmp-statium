@@ -27,7 +27,7 @@ import kotlin.time.Instant
 class GetStatusTest {
 
     @Test
-    @Ignore
+    @Ignore("Requires a valid URI")
     fun testGetTokenStatusList() =
         doTest(
             expectedStatus = Status.Valid,
@@ -53,7 +53,7 @@ private fun doTest(expectedStatus: Status, statusReference: StatusReference, clo
 }
 
 private fun CoroutineScope.getStatus(clock: Clock, httpClient: HttpClient): GetStatus {
-    val verifySignature = VerifyStatusListTokenSignature.Ignore
+    val verifySignature = VerifyStatusListTokenJwtSignature.Ignore
     val getStatusListToken = GetStatusListToken.usingJwt(clock, httpClient, verifySignature, kotlin.time.Duration.ZERO)
     val decompress = platformDecompress(coroutineContext)
     return GetStatus(getStatusListToken, decompress)
