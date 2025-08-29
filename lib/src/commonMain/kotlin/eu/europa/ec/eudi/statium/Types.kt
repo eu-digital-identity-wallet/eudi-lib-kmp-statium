@@ -123,8 +123,8 @@ public data class StatusList(
     public companion object {
 
         /**
-         * Attempts to create a [eu.europa.ec.eudi.statium.StatusList]
-         * It jus decodes the [base64UrlEncodedList]
+         * Attempts to create a [StatusList]
+         * It just decodes the [base64UrlEncodedList]
          *
          * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
          * @param base64UrlEncodedList The Base64 URL no padding encoded, compressed list
@@ -140,6 +140,23 @@ public data class StatusList(
                 val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
                 StatusList(bytesPerStatus, compressedList, aggregationUri)
             }
+
+        /**
+         * Creates a [StatusList] from a raw [ByteArray] list, effectively compressing [rawList]
+         *
+         * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
+         * @param rawList The raw list (uncompressed)
+         * @param aggregationUri  A URI to retrieve the Status List Aggregation for this type of Referenced Token or Issuer
+         *@return the status list
+         */
+        public suspend fun fromRawBytes(
+            bytesPerStatus: BitsPerStatus,
+            rawList: ByteArray,
+            aggregationUri: String? = null,
+        ): StatusList {
+            val compressedList = platformCompress().invoke(rawList)
+            return StatusList(bytesPerStatus, compressedList, aggregationUri)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
