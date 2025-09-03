@@ -4,6 +4,7 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.net.URI
 
 plugins {
@@ -28,6 +29,7 @@ kotlin {
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_2_1
         optIn =
             listOf(
                 "kotlinx.serialization.ExperimentalSerializationApi",
@@ -80,6 +82,7 @@ kotlin {
                 // Common dependencies
                 api(libs.kotlinx.serialization.core)
                 api(libs.kotlinx.serialization.json)
+                api(libs.kotlinx.serialization.cbor)
                 api(libs.kotlinx.coroutines.core)
                 api(libs.ktor.client.core)
                 implementation(libs.ktor.client.serialization)
