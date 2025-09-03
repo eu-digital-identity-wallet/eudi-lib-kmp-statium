@@ -40,8 +40,8 @@ public fun interface ParseCwt<out ProtectedHeader, out Payload> {
         ): ParseCwt<PH, P> = ParseCwt { input ->
             val (protectedHeaderBytes, payloadBytes) = ParseCwtUsingKotlinx(input)
             with(StatiumCbor) {
-                val protectedHeader = decodeFromByteArray<PH>(protectedHeaderSerializer, protectedHeaderBytes)
-                val payload = payloadBytes?.let { decodeFromByteArray<P>(payloadSerializer, it) }
+                val protectedHeader = decodeFromByteArray(protectedHeaderSerializer, protectedHeaderBytes)
+                val payload = payloadBytes?.let { decodeFromByteArray(payloadSerializer, it) }
                 CoseProtectedHeaderAndPayload(protectedHeader, payload)
             }
         }
@@ -61,21 +61,27 @@ public fun interface ParseCwt<out ProtectedHeader, out Payload> {
 
 internal object ParseCwtUsingKotlinx : ParseCwt<ByteArray, ByteArray> {
 
-    @Serializable
-    private class CoseUnprotectedHeader()
-
-    @Serializable
-    @CborArray
-    @ObjectTags(RFC8152.COSE_SIGN1_TAG)
-    private class CwtWithCoseSign1(
-        val protectedHeader: ByteArray,
-        val unprotectedHeader: CoseUnprotectedHeader,
-        val payload: ByteArray,
-        val signature: ByteArray,
-    )
-
     override suspend fun invoke(input: ByteArray): CoseProtectedHeaderAndPayload<ByteArray, ByteArray> {
+        return parseCoseSign1(input)
+    }
+
+    private val parseCoseSign1: ParseCwt<ByteArray, ByteArray> = ParseCwt { input ->
+        /**
+         * In this context, we don't care about the protected header
+         */
+        @Serializable
+        class CoseUnprotectedHeader()
+
+        @Serializable
+        @CborArray
+        @ObjectTags(RFC8152.COSE_SIGN1_TAG)
+        class CwtWithCoseSign1(
+            val protectedHeader: ByteArray,
+            val unprotectedHeader: CoseUnprotectedHeader,
+            val payload: ByteArray,
+            val signature: ByteArray,
+        )
         val coseSign1 = StatiumCbor.decodeFromByteArray<CwtWithCoseSign1>(input)
-        return coseSign1.let { CoseProtectedHeaderAndPayload(it.protectedHeader, it.payload) }
+        CoseProtectedHeaderAndPayload(coseSign1.protectedHeader, coseSign1.payload)
     }
 }
