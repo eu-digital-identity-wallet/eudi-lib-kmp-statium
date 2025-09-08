@@ -26,8 +26,8 @@ import kotlin.time.Instant
 
 class GetStatusTest {
 
+    @Ignore("Not a stable URL")
     @Test
-    @Ignore("Requires a valid URI")
     fun testGetTokenStatusList() =
         doTest(
             expectedStatus = Status.Valid,
@@ -37,6 +37,26 @@ class GetStatusTest {
             ),
             Clock.fixed(Instant.parse("2025-03-27T13:02:23Z")),
         )
+
+    @Ignore("Not a stable URL")
+    @Test
+    fun getCwtStatusListToken() = runTest {
+        HttpClient().use { httpClient ->
+            val getStatusListToken = GetStatusListToken.usingCwt(
+                clock = Clock.fixed(Instant.parse("2025-09-07T23:00:00Z")),
+                httpClient,
+                VerifyStatusListTokenCwtSignature.Ignore,
+            )
+
+            val statusListToken =
+                getStatusListToken(
+                    "https://dev.issuer.eudiw.dev/token_status_list/FC/eu.europa.ec.eudi.pid.1/35d13611-f4d7-40bc-97f0-f504906c9a86",
+                    null,
+                ).getOrThrow()
+
+            println(statusListToken)
+        }
+    }
 }
 
 fun Clock.Companion.fixed(at: Instant): Clock = object : Clock {

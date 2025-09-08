@@ -17,6 +17,8 @@ package eu.europa.ec.eudi.statium.http
 
 import eu.europa.ec.eudi.statium.StatusListTokenFormat
 import eu.europa.ec.eudi.statium.TokenStatusListSpec
+import eu.europa.ec.eudi.statium.http.GetStatusListTokenResponse.Companion.asCwt
+import eu.europa.ec.eudi.statium.http.GetStatusListTokenResponse.Companion.asJwt
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -24,26 +26,62 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlin.time.Instant
 
+public interface GetStatusListTokenResponse {
+    @JvmInline
+    public value class Jwt(public val value: String) : GetStatusListTokenResponse
+
+    @JvmInline
+    public value class Cwt(public val value: ByteArray) : GetStatusListTokenResponse
+
+    public companion object {
+        public fun String.asJwt(): GetStatusListTokenResponse = Jwt(this)
+        public fun ByteArray.asCwt(): GetStatusListTokenResponse = Cwt(this)
+    }
+}
+
 public interface GetStatusListTokenKtorOps {
 
     /**
-     * Retrieves the token status list given a [uri] and a [format].
+     * Retrieves the token status list given a [uri] and a [format]
      * Optionally a [time in point][at] be specified
      */
     public suspend fun HttpClient.getStatusListToken(
         uri: String,
         format: StatusListTokenFormat,
         at: Instant?,
-    ): Result<String> =
+    ): Result<GetStatusListTokenResponse> =
         runCatchingCancellable {
             val httpResponse = get(uri) {
                 accept(format.contentType())
                 at?.let { parameter(TokenStatusListSpec.TIME, it.epochSeconds) }
             }
             when {
-                httpResponse.status.isSuccess() -> httpResponse.bodyAsText()
+                httpResponse.status.isSuccess() ->
+                    when (format) {
+                        StatusListTokenFormat.JWT -> httpResponse.bodyAsText().asJwt()
+                        StatusListTokenFormat.CWT -> httpResponse.bodyAsBytes().asCwt()
+                    }
+
                 else -> error("Got status ${httpResponse.status} while calling $uri")
             }
+        }
+
+    public suspend fun HttpClient.getStatusListTokenInJwt(
+        uri: String,
+        at: Instant?,
+    ): Result<String> =
+        getStatusListToken(uri, StatusListTokenFormat.JWT, at).map { response ->
+            check(response is GetStatusListTokenResponse.Jwt) { "Expected JWT, got $response" }
+            response.value
+        }
+
+    public suspend fun HttpClient.getStatusListTokenInCwt(
+        uri: String,
+        at: Instant?,
+    ): Result<ByteArray> =
+        getStatusListToken(uri, StatusListTokenFormat.CWT, at).map { response ->
+            check(response is GetStatusListTokenResponse.Cwt) { "Expected JWT, got $response" }
+            response.value
         }
 
     public companion object : GetStatusListTokenKtorOps {
@@ -53,7 +91,7 @@ public interface GetStatusListTokenKtorOps {
                 StatusListTokenFormat.JWT -> TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_JWT
                 StatusListTokenFormat.CWT -> TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT
             }
-            return ContentType.Companion.parse(value)
+            return ContentType.parse(value)
         }
     }
 }

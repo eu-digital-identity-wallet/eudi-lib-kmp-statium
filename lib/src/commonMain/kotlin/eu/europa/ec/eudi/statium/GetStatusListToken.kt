@@ -93,7 +93,7 @@ internal class GetStatusListTokenUsingJwt(
         }
 
     private suspend fun fetchToken(uri: String, at: Instant?): String =
-        httpClient.getStatusListToken(uri, StatusListTokenFormat.JWT, at).getOrThrow()
+        httpClient.getStatusListTokenInJwt(uri, at).getOrThrow()
 
     private suspend fun verifySignature(unverifiedJwt: String, verificationTime: Instant) {
         verifyJwtSignature(unverifiedJwt, verificationTime)
@@ -107,8 +107,9 @@ internal class GetStatusListTokenUsingJwt(
         checkNotNull(type) {
             "Missing `typ` from JOSE header"
         }
-        check(type == TokenStatusListSpec.MEDIA_SUBTYPE_STATUS_LIST_JWT) {
-            "Wrong `typ` expecting ${TokenStatusListSpec.MEDIA_SUBTYPE_STATUS_LIST_JWT} found $type"
+        val expectedType = TokenStatusListSpec.MEDIA_SUBTYPE_STATUS_LIST_JWT
+        check(type == expectedType) {
+            "Wrong `typ` expecting $expectedType found $type"
         }
     }
 
@@ -149,10 +150,7 @@ internal class GetStatusListTokenUsingCwt(
         }
 
     private suspend fun fetchToken(uri: String, at: Instant?): ByteArray =
-        httpClient
-            .getStatusListToken(uri, StatusListTokenFormat.CWT, at)
-            .map(String::toByteArray) // TODO Check how CWT is encoded to the HTTP response
-            .getOrThrow()
+        httpClient.getStatusListTokenInCwt(uri, at).getOrThrow()
 
     private suspend fun verifySignature(unverifiedCwt: ByteArray, verificationTime: Instant) {
         verifyCwtSignature(unverifiedCwt, verificationTime)
@@ -163,8 +161,9 @@ internal class GetStatusListTokenUsingCwt(
         checkNotNull(type) {
             "Missing `type` from COSE header"
         }
-        check(type == TokenStatusListSpec.MEDIA_SUBTYPE_STATUS_LIST_CWT) {
-            "Wrong `type (16)` expecting ${TokenStatusListSpec.MEDIA_SUBTYPE_STATUS_LIST_CWT} found $type"
+        val expectedType = TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT
+        check(type == expectedType) {
+            "Wrong `type (16)` expecting $expectedType found $type"
         }
     }
 
