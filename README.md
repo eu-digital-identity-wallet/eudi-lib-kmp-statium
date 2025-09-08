@@ -18,7 +18,7 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 ## Overview
 
 Statium is a Kotlin multiplatform library supporting JVM and Android platforms. 
-It implements the Token Status List Specification [draft 10](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-10.html), 
+It implements the Token Status List Specification [draft 12](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-12.html), 
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
 
@@ -129,7 +129,7 @@ the `Status List` (via a `Status List Token`)
 Library provides for this use case the interface [ReadStatus](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/ReadStatus.kt)
 
 ```kotlin
-// Assuming you have already obtained a StatusListTokenClaims
+// Assuming you have already got a StatusListTokenClaims
 val claims: StatusListTokenClaims = obtainStatusListTokenClaims() // This function is not shown here
 val readStatus: ReadStatus = ReadStatus.fromStatusList(claims.statusList).getOrThrow()
 val status = readStatus(StatusIndex(5)).getOrThrow() // check index 5
@@ -157,7 +157,7 @@ Library provides for this use case the interface [GetStatus](lib/src/commonMain/
 val getStatusListToken: GetStatusListToken = TODO("Check above")
 
 // Create an instance of GetStatus using the GetStatusListToken
-val getStatus: GetStatus = GetStatus(getStatusListToken)
+val getStatus = GetStatus(getStatusListToken)
 
 // Assuming you have a StatusReference from a Referenced Token
 val statusReference = StatusReference(
