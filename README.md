@@ -113,10 +113,14 @@ val result = getStatusListToken(uri, null) // null means "now"
 val claims : StatusListTokenClaims = result.getOrThrow()
 println("Status list token claims: $claims")
 ```
+> [!NOTE]
+> Statium supports JWT and CWT formats (using COSE Sign 1)
+
 > [!IMPORTANT]
-> Statium doesn't verify the signature of the JWT, given that Token Status List specification lets 
+> Statium doesn't verify the signature of the JWT or the CWT, given that Token Status List specification lets 
 > ecosystems define their own processing rules. For this reason, you need to provide an implementation
-> of [VerifyStatusListTokenSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt).
+> of [VerifyStatusListTokenJwtSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt),
+> or use [VerifyStatusListTokenCwtSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt).
 > This will be used to verify the signature of the Status List Token after it has been fetched.
 
 ### Read a Status List

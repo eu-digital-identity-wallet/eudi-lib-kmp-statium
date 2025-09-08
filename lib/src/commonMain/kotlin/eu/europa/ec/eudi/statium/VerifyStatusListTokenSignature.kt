@@ -17,21 +17,6 @@ package eu.europa.ec.eudi.statium
 
 import kotlin.time.Instant
 
-/**
- * Verifies the status list token signature
- */
-public fun interface VerifyStatusListTokenSignature {
-    /**
-     * Verifies the signature of a status list at a specific [point in time][at].
-     * It raises an exception in case of invalid signature
-     */
-    public suspend operator fun invoke(
-        statusListToken: String,
-        format: StatusListTokenFormat,
-        at: Instant,
-    ): Result<Unit>
-}
-
 public fun interface VerifyStatusListTokenJwtSignature {
     /**
      * Verifies the signature of a status list at a specific [point in time][at].
