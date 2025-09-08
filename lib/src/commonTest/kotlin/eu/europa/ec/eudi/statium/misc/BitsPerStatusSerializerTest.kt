@@ -21,17 +21,16 @@ import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 
 class BitsPerStatusSerializerTest {
 
     @Test
     fun testSerialization() {
         // Test that each BitsPerStatus enum value is serialized to its corresponding bits value
-        assertEquals("1", Json.Default.encodeToString(BitsPerStatus.One))
-        assertEquals("2", Json.Default.encodeToString(BitsPerStatus.Two))
-        assertEquals("4", Json.Default.encodeToString(BitsPerStatus.Four))
-        assertEquals("8", Json.Default.encodeToString(BitsPerStatus.Eight))
+        assertEquals("1", Json.encodeToString(BitsPerStatus.One))
+        assertEquals("2", Json.encodeToString(BitsPerStatus.Two))
+        assertEquals("4", Json.encodeToString(BitsPerStatus.Four))
+        assertEquals("8", Json.encodeToString(BitsPerStatus.Eight))
     }
 
     @Test
@@ -48,8 +47,8 @@ class BitsPerStatusSerializerTest {
         // Test round-trip serialization and deserialization
         val values = BitsPerStatus.entries.toTypedArray()
         for (value in values) {
-            val json = Json.Default.encodeToString(value)
-            val decoded = Json.Default.decodeFromString<BitsPerStatus>(json)
+            val json = Json.encodeToString(value)
+            val decoded = Json.decodeFromString<BitsPerStatus>(json)
             assertEquals(value, decoded)
         }
     }
@@ -60,10 +59,10 @@ class BitsPerStatusSerializerTest {
         val invalidValues = listOf("0", "3", "5", "6", "7", "9", "10")
         for (invalidValue in invalidValues) {
             val exception = assertFailsWith<SerializationException> {
-                Json.Default.decodeFromString<BitsPerStatus>(invalidValue)
+                Json.decodeFromString<BitsPerStatus>(invalidValue)
             }
             // Verify the exception has the expected message
-            assertTrue(exception.message?.contains("Invalid bits value") == true)
+            assertEquals(exception.message?.contains("Invalid bits value"), true)
         }
     }
 }
