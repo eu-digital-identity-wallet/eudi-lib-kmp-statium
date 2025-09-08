@@ -36,10 +36,10 @@ class BitsPerStatusSerializerTest {
     @Test
     fun testDeserialization() {
         // Test that each bits value is deserialized to the correct BitsPerStatus enum value
-        assertEquals(BitsPerStatus.One, Json.Default.decodeFromString("1"))
-        assertEquals(BitsPerStatus.Two, Json.Default.decodeFromString("2"))
-        assertEquals(BitsPerStatus.Four, Json.Default.decodeFromString("4"))
-        assertEquals(BitsPerStatus.Eight, Json.Default.decodeFromString("8"))
+        assertEquals(BitsPerStatus.One, Json.decodeFromString("1"))
+        assertEquals(BitsPerStatus.Two, Json.decodeFromString("2"))
+        assertEquals(BitsPerStatus.Four, Json.decodeFromString("4"))
+        assertEquals(BitsPerStatus.Eight, Json.decodeFromString("8"))
     }
 
     @Test
