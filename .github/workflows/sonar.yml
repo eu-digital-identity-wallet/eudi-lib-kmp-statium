@@ -73,7 +73,7 @@ jobs:
             -Dsonar.tests=lib/src/commonTest,lib/src/jvmAndAndroidTest
             -Dsonar.java.binaries=lib/build/classes/kotlin/jvm
             -Dsonar.kotlin.binaries=lib/build/classes/kotlin/jvm
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: (github.repository_owner == 'eu-digital-identity-wallet' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch'))
         with:
           node-version: 18
