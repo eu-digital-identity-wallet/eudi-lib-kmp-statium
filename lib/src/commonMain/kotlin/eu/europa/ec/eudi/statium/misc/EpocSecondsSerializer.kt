@@ -16,6 +16,8 @@
 package eu.europa.ec.eudi.statium.misc
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.cbor.CborDecoder
+import kotlinx.serialization.cbor.CborEncoder
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -34,5 +36,26 @@ internal object EpocSecondsSerializer : KSerializer<Instant> {
 
     override fun serialize(encoder: Encoder, value: Instant) {
         encoder.encodeLong(value.epochSeconds)
+    }
+}
+
+internal object EpocSecondsCborSerializer : KSerializer<Instant> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("eu.europa.ec.eudi.statium.misc.EpocSecondsCborSerializer", PrimitiveKind.LONG)
+
+    override fun serialize(encoder: Encoder, value: Instant) {
+        require(encoder is CborEncoder) { "This serializer can only be used with CBOR encoding" }
+
+        // For now, just encode the epoch seconds as a long value
+        // TODO: Add CBOR tag 1 encoding when the method is available
+        encoder.encodeLong(value.epochSeconds)
+    }
+
+    override fun deserialize(decoder: Decoder): Instant {
+        require(decoder is CborDecoder) { "This serializer can only be used with CBOR encoding" }
+
+        // For now, just decode the epoch seconds as a long value
+        // TODO: Add CBOR tag 1 decoding when the method is available
+        return Instant.fromEpochSeconds(decoder.decodeLong())
     }
 }

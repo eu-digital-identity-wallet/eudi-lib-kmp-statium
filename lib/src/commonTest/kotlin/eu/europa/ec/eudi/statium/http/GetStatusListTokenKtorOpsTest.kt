@@ -48,7 +48,10 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
             respond(
                 content = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
                 status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_JWT),
+                headers = headersOf(
+                    HttpHeaders.ContentType,
+                    TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_JWT,
+                ),
             )
         }
 
@@ -56,9 +59,8 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
         val client = HttpClient(mockEngine)
 
         // Call the method under test
-        val result = client.getStatusListToken(
+        val result = client.getStatusListTokenInJwt(
             "https://example.com/status",
-            StatusListTokenFormat.JWT,
             null,
         )
 
@@ -88,9 +90,12 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
 
             // Return a mock response
             respond(
-                content = "d2845824a3012603686b63726564656e7469616c5374617475738143a101a1054c0102030405060708090a0b0c0d0e0f",
+                content = "d2845824a3012603686b63726564656e7469616c5374617475738143a101a1054c0102030405060708090a0b0c0d0e0f".hexToByteArray(),
                 status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT),
+                headers = headersOf(
+                    HttpHeaders.ContentType,
+                    TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT,
+                ),
             )
         }
 
@@ -98,9 +103,8 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
         val client = HttpClient(mockEngine)
 
         // Call the method under test
-        val result = client.getStatusListToken(
+        val result = client.getStatusListTokenInCwt(
             "https://example.com/status",
-            StatusListTokenFormat.CWT,
             testTime,
         )
 
@@ -108,7 +112,7 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
         assertTrue(result.isSuccess)
         assertEquals(
             "d2845824a3012603686b63726564656e7469616c5374617475738143a101a1054c0102030405060708090a0b0c0d0e0f",
-            result.getOrThrow(),
+            result.map { it.toHexString() }.getOrThrow(),
         )
     }
 

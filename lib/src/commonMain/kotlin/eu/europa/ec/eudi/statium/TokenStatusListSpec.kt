@@ -31,6 +31,9 @@ public object TokenStatusListSpec {
     public const val TIME_TO_LIVE: String = "ttl"
     public const val TIME: String = "time"
 
+    public const val TIME_TO_LIVE_COSE: Long = 65534
+    public const val STATUS_LIST_COSE: Long = 65533
+
     public const val STATUS_VALID: UByte = 0x00u
     public const val STATUS_INVALID: UByte = 0x01u
     public const val STATUS_SUSPENDED: UByte = 0x02u

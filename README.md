@@ -18,7 +18,7 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 ## Overview
 
 Statium is a Kotlin multiplatform library supporting JVM and Android platforms. 
-It implements the Token Status List Specification [draft 10](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-10.html), 
+It implements the Token Status List Specification [draft 12](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-12.html), 
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
 
@@ -101,7 +101,7 @@ Library provides for this use case the interface [GetStatusListToken](lib/src/co
 val getStatusListToken: GetStatusListToken = GetStatusListToken.usingJwt(
     clock = Clock.System,
     httpClient = HttpClient(), // Just an example, remember to close the client when you're done!
-    verifyStatusListTokenSignature = VerifyStatusListTokenSignature.Ignore, // Not for production
+    verifyStatusListTokenSignature = VerifyStatusListTokenJwtSignature.Ignore, // Not for production
     allowedClockSkew = 5.minutes // Allow 5 minutes of clock skew (requires import: kotlin.time.Duration.Companion.minutes)
 )
 
@@ -113,10 +113,14 @@ val result = getStatusListToken(uri, null) // null means "now"
 val claims : StatusListTokenClaims = result.getOrThrow()
 println("Status list token claims: $claims")
 ```
+> [!NOTE]
+> Statium supports JWT and CWT formats (using COSE Sign 1)
+
 > [!IMPORTANT]
-> Statium doesn't verify the signature of the JWT, given that Token Status List specification lets 
+> Statium doesn't verify the signature of the JWT or the CWT, given that Token Status List specification lets 
 > ecosystems define their own processing rules. For this reason, you need to provide an implementation
-> of [VerifyStatusListTokenSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt).
+> of [VerifyStatusListTokenJwtSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt),
+> or use [VerifyStatusListTokenCwtSignature](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/VerifyStatusListTokenSignature.kt).
 > This will be used to verify the signature of the Status List Token after it has been fetched.
 
 ### Read a Status List
@@ -129,7 +133,7 @@ the `Status List` (via a `Status List Token`)
 Library provides for this use case the interface [ReadStatus](lib/src/commonMain/kotlin/eu/europa/ec/eudi/statium/ReadStatus.kt)
 
 ```kotlin
-// Assuming you have already obtained a StatusListTokenClaims
+// Assuming you have already got a StatusListTokenClaims
 val claims: StatusListTokenClaims = obtainStatusListTokenClaims() // This function is not shown here
 val readStatus: ReadStatus = ReadStatus.fromStatusList(claims.statusList).getOrThrow()
 val status = readStatus(StatusIndex(5)).getOrThrow() // check index 5
@@ -157,7 +161,7 @@ Library provides for this use case the interface [GetStatus](lib/src/commonMain/
 val getStatusListToken: GetStatusListToken = TODO("Check above")
 
 // Create an instance of GetStatus using the GetStatusListToken
-val getStatus: GetStatus = GetStatus(getStatusListToken)
+val getStatus = GetStatus(getStatusListToken)
 
 // Assuming you have a StatusReference from a Referenced Token
 val statusReference = StatusReference(
