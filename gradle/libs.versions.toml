@@ -5,12 +5,12 @@ android-library = "8.5.2"
 kotlinx-serialization = "1.8.1"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.2.3"
-maven-publish = "0.32.0"
+maven-publish = "0.34.0"
 spotless = "7.0.2"
 ktlint = "1.2.1"
 dependency-check = "12.1.1"
 kover = "0.9.1"
-dokka = "1.9.20"
+dokka = "2.1.0"
 
 [libraries]
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
