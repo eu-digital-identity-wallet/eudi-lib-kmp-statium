@@ -15,19 +15,21 @@
  */
 package eu.europa.ec.eudi.statium
 
+import eu.europa.ec.eudi.statium.cose.RFC8392
 import eu.europa.ec.eudi.statium.jose.RFC7519
 import eu.europa.ec.eudi.statium.misc.Base64UrlNoPadding
 import eu.europa.ec.eudi.statium.misc.BitsPerStatusSerializer
 import eu.europa.ec.eudi.statium.misc.EpocSecondsSerializer
 import eu.europa.ec.eudi.statium.misc.StatiumJsonSerializersModule
-import eu.europa.ec.eudi.statium.misc.resultOf
-import kotlinx.datetime.Instant
+import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.CborLabel
 import kotlin.jvm.JvmInline
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 /**
  * Represents the number of [bits] for a status.
@@ -60,8 +62,7 @@ public enum class BitsPerStatus(public val bits: Int) {
 
 /**
  * Represents the index to check for status information in the Status List
- *
- * @param value it MUST be a non-negative number, zero or greater
+ * The [value] MUST be a non-negative number, zero or greater
  */
 @Serializable
 @JvmInline
@@ -123,8 +124,8 @@ public data class StatusList(
     public companion object {
 
         /**
-         * Attempts to create a [eu.europa.ec.eudi.statium.StatusList]
-         * It jus decodes the [base64UrlEncodedList]
+         * Attempts to create a [StatusList]
+         * It just decodes the [base64UrlEncodedList]
          *
          * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
          * @param base64UrlEncodedList The Base64 URL no padding encoded, compressed list
@@ -136,10 +137,27 @@ public data class StatusList(
             base64UrlEncodedList: String,
             aggregationUri: String? = null,
         ): Result<StatusList> =
-            resultOf {
+            runCatchingCancellable {
                 val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
                 StatusList(bytesPerStatus, compressedList, aggregationUri)
             }
+
+        /**
+         * Creates a [StatusList] from a raw [ByteArray] list, effectively compressing [rawList]
+         *
+         * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
+         * @param rawList The raw list (uncompressed)
+         * @param aggregationUri  A URI to retrieve the Status List Aggregation for this type of Referenced Token or Issuer
+         *@return the status list
+         */
+        public suspend fun fromRawBytes(
+            bytesPerStatus: BitsPerStatus,
+            rawList: ByteArray,
+            aggregationUri: String? = null,
+        ): StatusList {
+            val compressedList = platformCompress().invoke(rawList)
+            return StatusList(bytesPerStatus, compressedList, aggregationUri)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -198,17 +216,18 @@ public value class PositiveDurationAsSeconds(public val value: DurationAsSeconds
  * @param timeToLive The duration that the token can cached
  * @param statusList The Status List
  *
- * @see StatiumJsonSerializersModule for JSON serialization
+ * @see eu.europa.ec.eudi.statium.misc.StatiumJsonSerializersModule for JSON serialization
+ * @see eu.europa.ec.eudi.statium.misc.StatiumCborSerializersModule for CBOR serialization
  */
 @Serializable
 public data class StatusListTokenClaims
 @Throws(IllegalStateException::class)
 public constructor(
-    @SerialName(RFC7519.SUBJECT) @Required val subject: String,
-    @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
-    @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
-    @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
-    @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
+    @CborLabel(RFC8392.SUBJECT) @SerialName(RFC7519.SUBJECT) @Required val subject: String,
+    @CborLabel(RFC8392.ISSUED_AT) @SerialName(RFC7519.ISSUED_AT) @Required @Contextual val issuedAt: InstantAsEpocSeconds,
+    @CborLabel(RFC8392.EXPIRATION_TIME) @SerialName(RFC7519.EXPIRATION_TIME) @Contextual val expirationTime: InstantAsEpocSeconds? = null,
+    @CborLabel(TokenStatusListSpec.TIME_TO_LIVE_COSE) @SerialName(TokenStatusListSpec.TIME_TO_LIVE) val timeToLive: PositiveDurationAsSeconds? = null,
+    @CborLabel(TokenStatusListSpec.STATUS_LIST_COSE) @SerialName(TokenStatusListSpec.STATUS_LIST) val statusList: StatusList,
 ) {
     init {
         require(subject.isNotBlank()) { "The subject must not be empty." }
@@ -291,7 +310,7 @@ public sealed interface Status : Comparable<Status> {
          * @param bitsPerStatus the number of bits for representing the status
          * @param statusValue the value of the status
          */
-        public operator fun invoke(bitsPerStatus: BitsPerStatus, statusValue: UByte): Result<Status> = runCatching {
+        public operator fun invoke(bitsPerStatus: BitsPerStatus, statusValue: UByte): Result<Status> = runCatchingCancellable {
             val maxValue: UByte = when (bitsPerStatus) {
                 BitsPerStatus.One -> 1u
                 BitsPerStatus.Two -> 3u

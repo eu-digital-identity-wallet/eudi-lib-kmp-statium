@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.europa.ec.eudi.statium.misc
+package eu.europa.ec.eudi.statium.cose
 
-import eu.europa.ec.eudi.statium.platformNonFatal
+/**
+ * [RFC8152 - COSE](https://datatracker.ietf.org/doc/html/rfc8152)
+ */
+public object RFC8152 {
 
-public inline fun <T, R> T.resultOf(block: () -> R): Result<R> =
-    try {
-        Result.success(block())
-    } catch (e: Throwable) {
-        if (platformNonFatal(e)) Result.failure(e) else throw e
-    }
+    /**
+     * Tag value for a COSE Single Signer Data Object
+     */
+    public const val COSE_SIGN1_TAG: ULong = 18u
 
-public inline fun <R> resultOf(block: () -> R): Result<R> =
-    try {
-        Result.success(block())
-    } catch (e: Throwable) {
-        if (platformNonFatal(e)) Result.failure(e) else throw e
-    }
+    /**
+     * Tag value for a COSE Mac w/o Recipients Object
+     */
+    public const val COSE_MAC0_TAG: ULong = 17u
+}

@@ -16,8 +16,8 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Decompress
-import eu.europa.ec.eudi.statium.misc.resultOf
-import kotlinx.datetime.Instant
+import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
+import kotlin.time.Instant
 
 /**
  * Allows the caller to get the status of a [`status_list`][StatusReference],
@@ -59,7 +59,7 @@ public fun interface GetStatus {
             getStatusListToken: GetStatusListToken,
             decompress: Decompress = platformDecompress(),
         ): GetStatus = GetStatus { at ->
-            resultOf {
+            runCatchingCancellable {
                 val statusListTokenClaims = getStatusListToken(uri, at).getOrThrow()
                 val statusList = statusListTokenClaims.statusList
                 val readStatus = ReadStatus.fromStatusList(statusList, decompress).getOrThrow()

@@ -15,12 +15,12 @@
  */
 package eu.europa.ec.eudi.statium
 
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 class StatusListTokenValidationsTest : StatusListTokenValidations {
 

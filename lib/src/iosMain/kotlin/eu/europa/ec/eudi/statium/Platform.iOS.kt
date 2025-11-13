@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 package eu.europa.ec.eudi.statium
+import eu.europa.ec.eudi.statium.misc.Compress
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.IOSDecompress
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
-import kotlinx.coroutines.CancellationException
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 
 internal actual fun platformDecompress(context: CoroutineContext): Decompress = IOSDecompress()
@@ -29,10 +32,27 @@ internal actual fun platformDecompress(context: CoroutineContext): Decompress = 
  */
 internal actual fun platformIoContext(): CoroutineContext = Dispatchers.Default
 
-public actual fun platformNonFatal(throwable: Throwable): Boolean =
-    when (throwable) {
-        is CancellationException -> false
-        else -> true
-    }
+internal actual fun platformCompress(context: CoroutineContext): Compress {
+    TODO("Not yet implemented")
+}
 
-internal actual fun platformHttpClient(): HttpClient = HttpClient(Darwin)
+internal actual fun createHttpClient(): HttpClient {
+    return HttpClient(Darwin) {
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    prettyPrint = true
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+            )
+        }
+
+        // Optional: tune iOS-specific networking behavior
+        engine {
+            configureRequest {
+                setAllowsCellularAccess(true)
+            }
+        }
+    }
+}

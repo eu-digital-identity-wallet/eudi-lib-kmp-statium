@@ -15,8 +15,10 @@
  */
 package eu.europa.ec.eudi.statium
 
+import eu.europa.ec.eudi.statium.misc.StatiumCbor
 import eu.europa.ec.eudi.statium.misc.StatiumJson
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.decodeFromByteArray
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -489,8 +491,9 @@ class ReadStatusTestVectors {
 
     private fun doTestReadStatus(tv: TestVector) =
         runTest {
-            val decompress = platformDecompress()
-            val readStatus = ReadStatus.fromStatusList(tv.statusList, decompress).getOrThrow()
+            val decompress = platformDecompress(coroutineContext)
+            val statusList = StatiumCbor.decodeFromByteArray<StatusList>(tv.statusListCborBytes)
+            val readStatus = ReadStatus.fromStatusList(statusList, decompress).getOrThrow()
             tv.expectedStatuses.forEach { (index, expectedStatus) ->
                 val actualStatus = readStatus(index).getOrThrow()
                 assertEquals(expectedStatus, actualStatus)

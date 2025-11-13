@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.europa.ec.eudi.statium
+package eu.europa.ec.eudi.statium.misc
 
-import eu.europa.ec.eudi.statium.misc.Compress
-import eu.europa.ec.eudi.statium.misc.Decompress
-import eu.europa.ec.eudi.statium.misc.JvmAndAndroidCompress
-import eu.europa.ec.eudi.statium.misc.JvmAndroidDecompress
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
 
-internal actual fun platformIoContext(): CoroutineContext = Dispatchers.IO
-
-internal actual fun platformDecompress(context: CoroutineContext): Decompress = JvmAndroidDecompress(context)
-
-internal actual fun platformCompress(context: CoroutineContext): Compress = JvmAndAndroidCompress(context)
+internal inline fun <R> runCatchingCancellable(block: () -> R): Result<R> =
+    try {
+        Result.success(block())
+    } catch (ce: CancellationException) {
+        throw ce
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
