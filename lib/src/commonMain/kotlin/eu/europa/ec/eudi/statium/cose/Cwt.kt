@@ -38,7 +38,7 @@ public fun interface ParseCwt<out ProtectedHeader, out Payload> {
             payloadSerializer: kotlinx.serialization.KSerializer<P>,
             parseCwt: ParseCwt<ByteArray, ByteArray>,
         ): ParseCwt<PH, P> = ParseCwt { input ->
-            val (protectedHeaderBytes, payloadBytes) = ParseCwtUsingKotlinx(input)
+            val (protectedHeaderBytes, payloadBytes) = parseCwt(input)
             with(StatiumCbor) {
                 val protectedHeader = decodeFromByteArray(protectedHeaderSerializer, protectedHeaderBytes)
                 val payload = payloadBytes?.let { decodeFromByteArray(payloadSerializer, it) }
