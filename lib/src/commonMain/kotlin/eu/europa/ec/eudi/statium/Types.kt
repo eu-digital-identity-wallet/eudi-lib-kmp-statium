@@ -27,6 +27,7 @@ import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.CborLabel
+import kotlin.jvm.JvmInline
 import kotlin.time.Duration
 import kotlin.time.Instant
 

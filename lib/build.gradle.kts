@@ -3,6 +3,7 @@ import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.net.URI
 
@@ -44,6 +45,19 @@ kotlin {
 
     // JVM target
     jvm()
+
+    val iosX64 = iosX64()
+    val iosArm64 = iosArm64()
+    val iosSimArm64 = iosSimulatorArm64()
+
+    val xcFramework = XCFramework()
+
+    listOf(iosX64, iosArm64, iosSimArm64).forEach {
+        it.binaries.framework {
+            baseName = "lib"
+            xcFramework.add(this)
+        }
+    }
 
     // Android target
     androidTarget {
@@ -107,6 +121,12 @@ kotlin {
         androidUnitTest {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+            }
+        }
+
+        iosMain {
+            dependencies {
+                implementation(libs.ktor.client.darwin)
             }
         }
     }

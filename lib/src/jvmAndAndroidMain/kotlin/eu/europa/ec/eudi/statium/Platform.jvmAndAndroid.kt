@@ -19,6 +19,8 @@ import eu.europa.ec.eudi.statium.misc.Compress
 import eu.europa.ec.eudi.statium.misc.Decompress
 import eu.europa.ec.eudi.statium.misc.JvmAndAndroidCompress
 import eu.europa.ec.eudi.statium.misc.JvmAndroidDecompress
+import io.ktor.client.HttpClient
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
