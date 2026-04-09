@@ -28,15 +28,14 @@ class GetStatusTest {
 
     @Ignore("Not a stable URL")
     @Test
-    fun testGetTokenStatusList() =
-        doTest(
-            expectedStatus = Status.Valid,
-            statusReference = StatusReference(
-                index = StatusIndex(90),
-                uri = "https://issuer.eudiw.dev/token_status_list/FC/eu.europa.ec.eudi.pid.1/372baa1f-2145-4e99-93df-7b6e9746db05",
-            ),
-            Clock.fixed(Instant.parse("2025-03-27T13:02:23Z")),
-        )
+    fun testGetTokenStatusList() = doTest(
+        expectedStatus = Status.Valid,
+        statusReference = StatusReference(
+            index = StatusIndex(90),
+            uri = "https://issuer.eudiw.dev/token_status_list/FC/eu.europa.ec.eudi.pid.1/372baa1f-2145-4e99-93df-7b6e9746db05",
+        ),
+        Clock.fixed(Instant.parse("2025-03-27T13:02:23Z")),
+    )
 
     @Ignore("Not a stable URL")
     @Test

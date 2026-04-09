@@ -25,37 +25,33 @@ public interface StatusListTokenValidations {
         expectedSubject: String,
         validationTime: Instant,
         allowedClockSkew: Duration,
-    ): StatusListTokenClaims =
-        apply {
-            ensureSubject(expectedSubject)
-            ensureIssuedBefore(validationTime, allowedClockSkew)
-            ensureNotExpired(validationTime, allowedClockSkew)
-        }
+    ): StatusListTokenClaims = apply {
+        ensureSubject(expectedSubject)
+        ensureIssuedBefore(validationTime, allowedClockSkew)
+        ensureNotExpired(validationTime, allowedClockSkew)
+    }
 
-    public fun StatusListTokenClaims.ensureIssuedBefore(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims =
-        apply {
-            val adjustedValidationTime = validationTime + allowedClockSkew
-            check(issuedAt <= adjustedValidationTime) {
-                "Status list token issued ($issuedAt) after validation time: $validationTime (with clock skew: $allowedClockSkew)"
+    public fun StatusListTokenClaims.ensureIssuedBefore(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims = apply {
+        val adjustedValidationTime = validationTime + allowedClockSkew
+        check(issuedAt <= adjustedValidationTime) {
+            "Status list token issued ($issuedAt) after validation time: $validationTime (with clock skew: $allowedClockSkew)"
+        }
+    }
+
+    public fun StatusListTokenClaims.ensureNotExpired(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims = apply {
+        if (expirationTime != null) {
+            val adjustedValidationTime = validationTime - allowedClockSkew
+            check(expirationTime >= adjustedValidationTime) {
+                "Status list token expired ($expirationTime) for validation time: $validationTime (with clock skew: $allowedClockSkew)"
             }
         }
+    }
 
-    public fun StatusListTokenClaims.ensureNotExpired(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims =
-        apply {
-            if (expirationTime != null) {
-                val adjustedValidationTime = validationTime - allowedClockSkew
-                check(expirationTime >= adjustedValidationTime) {
-                    "Status list token expired ($expirationTime) for validation time: $validationTime (with clock skew: $allowedClockSkew)"
-                }
-            }
+    public fun StatusListTokenClaims.ensureSubject(expectedSubject: String): StatusListTokenClaims = apply {
+        check(expectedSubject == subject) {
+            "Wrong `${RFC7519.SUBJECT}` claim. Expected: `$expectedSubject`, actual: `$subject`"
         }
-
-    public fun StatusListTokenClaims.ensureSubject(expectedSubject: String): StatusListTokenClaims =
-        apply {
-            check(expectedSubject == subject) {
-                "Wrong `${RFC7519.SUBJECT}` claim. Expected: `$expectedSubject`, actual: `$subject`"
-            }
-        }
+    }
 
     public companion object : StatusListTokenValidations
 }

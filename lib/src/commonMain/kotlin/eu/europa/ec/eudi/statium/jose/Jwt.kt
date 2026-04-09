@@ -22,15 +22,14 @@ import kotlinx.io.Buffer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 
-internal inline fun <reified H, reified P> jwtHeaderAndPayload(jwt: String): Result<Pair<H, P>> =
-    runCatchingCancellable {
-        val (headerPart, payloadPart, _) = parts(jwt)
-        with(StatiumJson) {
-            val header = decodeBase64<H>(headerPart)
-            val statusList = decodeBase64<P>(payloadPart)
-            header to statusList
-        }
+internal inline fun <reified H, reified P> jwtHeaderAndPayload(jwt: String): Result<Pair<H, P>> = runCatchingCancellable {
+    val (headerPart, payloadPart, _) = parts(jwt)
+    with(StatiumJson) {
+        val header = decodeBase64<H>(headerPart)
+        val statusList = decodeBase64<P>(payloadPart)
+        header to statusList
     }
+}
 
 private fun parts(jwt: String): Triple<String, String, String> {
     val parts = jwt.split(".")

@@ -135,11 +135,10 @@ public data class StatusList(
             bytesPerStatus: BitsPerStatus,
             base64UrlEncodedList: String,
             aggregationUri: String? = null,
-        ): Result<StatusList> =
-            runCatchingCancellable {
-                val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
-                StatusList(bytesPerStatus, compressedList, aggregationUri)
-            }
+        ): Result<StatusList> = runCatchingCancellable {
+            val compressedList = Base64UrlNoPadding.decode(base64UrlEncodedList)
+            StatusList(bytesPerStatus, compressedList, aggregationUri)
+        }
 
         /**
          * Creates a [StatusList] from a raw [ByteArray] list, effectively compressing [rawList]
@@ -329,7 +328,6 @@ public sealed interface Status : Comparable<Status> {
          * According to specification returns true in case the given [value]
          * is [TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC] or in the [applicationSpecificRange]
          */
-        public fun isApplicationSpecific(value: UByte): Boolean =
-            value == TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC || value in applicationSpecificRange
+        public fun isApplicationSpecific(value: UByte): Boolean = value == TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC || value in applicationSpecificRange
     }
 }

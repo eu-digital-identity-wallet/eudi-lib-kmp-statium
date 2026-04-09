@@ -489,14 +489,13 @@ class ReadStatusTestVectors {
     @Test
     fun testVector8() = doTestReadStatus(TestVectors.TV8)
 
-    private fun doTestReadStatus(tv: TestVector) =
-        runTest {
-            val decompress = platformDecompress(coroutineContext)
-            val statusList = StatiumCbor.decodeFromByteArray<StatusList>(tv.statusListCborBytes)
-            val readStatus = ReadStatus.fromStatusList(statusList, decompress).getOrThrow()
-            tv.expectedStatuses.forEach { (index, expectedStatus) ->
-                val actualStatus = readStatus(index).getOrThrow()
-                assertEquals(expectedStatus, actualStatus)
-            }
+    private fun doTestReadStatus(tv: TestVector) = runTest {
+        val decompress = platformDecompress(coroutineContext)
+        val statusList = StatiumCbor.decodeFromByteArray<StatusList>(tv.statusListCborBytes)
+        val readStatus = ReadStatus.fromStatusList(statusList, decompress).getOrThrow()
+        tv.expectedStatuses.forEach { (index, expectedStatus) ->
+            val actualStatus = readStatus(index).getOrThrow()
+            assertEquals(expectedStatus, actualStatus)
         }
+    }
 }

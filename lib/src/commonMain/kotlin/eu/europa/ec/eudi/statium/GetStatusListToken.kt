@@ -42,13 +42,12 @@ public fun interface GetStatusListToken {
             httpClient: HttpClient,
             verifyStatusListTokenSignature: VerifyStatusListTokenJwtSignature,
             allowedClockSkew: Duration = Duration.ZERO,
-        ): GetStatusListToken =
-            GetStatusListTokenUsingJwt(
-                clock,
-                httpClient,
-                verifyStatusListTokenSignature,
-                allowedClockSkew,
-            )
+        ): GetStatusListToken = GetStatusListTokenUsingJwt(
+            clock,
+            httpClient,
+            verifyStatusListTokenSignature,
+            allowedClockSkew,
+        )
 
         /**
          * Factory method that creates an instance of [GetStatusListToken]
@@ -60,14 +59,13 @@ public fun interface GetStatusListToken {
             verifyStatusListTokenSignature: VerifyStatusListTokenCwtSignature,
             parseCwt: ParseCwt<ByteArray, ByteArray> = ParseCwt.default(),
             allowedClockSkew: Duration = Duration.ZERO,
-        ): GetStatusListToken =
-            GetStatusListTokenUsingCwt(
-                clock,
-                httpClient,
-                verifyStatusListTokenSignature,
-                parseCwt,
-                allowedClockSkew,
-            )
+        ): GetStatusListToken = GetStatusListTokenUsingCwt(
+            clock,
+            httpClient,
+            verifyStatusListTokenSignature,
+            parseCwt,
+            allowedClockSkew,
+        )
     }
 }
 
@@ -76,32 +74,31 @@ internal class GetStatusListTokenUsingJwt(
     private val httpClient: HttpClient,
     private val verifyJwtSignature: VerifyStatusListTokenJwtSignature,
     private val allowedClockSkew: Duration,
-) : GetStatusListToken, GetStatusListTokenKtorOps, StatusListTokenValidations {
+) : GetStatusListToken,
+    GetStatusListTokenKtorOps,
+    StatusListTokenValidations {
 
     init {
         require(allowedClockSkew >= Duration.ZERO) { "allowedClockSkew must be >= 0" }
     }
 
-    override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> =
-        runCatchingCancellable {
-            val unverifiedJwt = fetchToken(uri, at)
-            val validationTime = at ?: clock.now()
-            verifySignature(unverifiedJwt, validationTime)
-            val (header, claims) = parse(unverifiedJwt)
-            header.ensureTypeIsStatusListJwt()
-            claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
-        }
+    override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> = runCatchingCancellable {
+        val unverifiedJwt = fetchToken(uri, at)
+        val validationTime = at ?: clock.now()
+        verifySignature(unverifiedJwt, validationTime)
+        val (header, claims) = parse(unverifiedJwt)
+        header.ensureTypeIsStatusListJwt()
+        claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
+    }
 
-    private suspend fun fetchToken(uri: String, at: Instant?): String =
-        httpClient.getStatusListTokenInJwt(uri, at).getOrThrow()
+    private suspend fun fetchToken(uri: String, at: Instant?): String = httpClient.getStatusListTokenInJwt(uri, at).getOrThrow()
 
     private suspend fun verifySignature(unverifiedJwt: String, verificationTime: Instant) {
         verifyJwtSignature(unverifiedJwt, verificationTime)
             .getOrElse { error -> throw IllegalStateException("Invalid JWT signature", error) }
     }
 
-    private fun parse(jwt: String): Pair<Header, StatusListTokenClaims> =
-        jwtHeaderAndPayload<Header, StatusListTokenClaims>(jwt).getOrThrow()
+    private fun parse(jwt: String): Pair<Header, StatusListTokenClaims> = jwtHeaderAndPayload<Header, StatusListTokenClaims>(jwt).getOrThrow()
 
     private fun Header.ensureTypeIsStatusListJwt() {
         checkNotNull(type) {
@@ -130,7 +127,9 @@ internal class GetStatusListTokenUsingCwt(
     private val verifyCwtSignature: VerifyStatusListTokenCwtSignature,
     parseCwt: ParseCwt<ByteArray, ByteArray>,
     private val allowedClockSkew: Duration,
-) : GetStatusListToken, GetStatusListTokenKtorOps, StatusListTokenValidations {
+) : GetStatusListToken,
+    GetStatusListTokenKtorOps,
+    StatusListTokenValidations {
 
     init {
         require(allowedClockSkew >= Duration.ZERO) { "allowedClockSkew must be >= 0" }
@@ -138,19 +137,17 @@ internal class GetStatusListTokenUsingCwt(
 
     private val parseCwt: ParseCwt<ProtectedHeader, StatusListTokenClaims> = ParseCwt.map(parseCwt)
 
-    override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> =
-        runCatchingCancellable {
-            val unverifiedCwt = fetchToken(uri, at)
-            val validationTime = at ?: clock.now()
-            verifySignature(unverifiedCwt, validationTime)
-            val (header, claims) = parseCwt(unverifiedCwt)
-            checkNotNull(claims) { "Missing claims in CWT" }
-            header.ensureTypeIsStatusListCwt()
-            claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
-        }
+    override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> = runCatchingCancellable {
+        val unverifiedCwt = fetchToken(uri, at)
+        val validationTime = at ?: clock.now()
+        verifySignature(unverifiedCwt, validationTime)
+        val (header, claims) = parseCwt(unverifiedCwt)
+        checkNotNull(claims) { "Missing claims in CWT" }
+        header.ensureTypeIsStatusListCwt()
+        claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
+    }
 
-    private suspend fun fetchToken(uri: String, at: Instant?): ByteArray =
-        httpClient.getStatusListTokenInCwt(uri, at).getOrThrow()
+    private suspend fun fetchToken(uri: String, at: Instant?): ByteArray = httpClient.getStatusListTokenInCwt(uri, at).getOrThrow()
 
     private suspend fun verifySignature(unverifiedCwt: ByteArray, verificationTime: Instant) {
         verifyCwtSignature(unverifiedCwt, verificationTime)

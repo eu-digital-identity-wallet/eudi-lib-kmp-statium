@@ -17,11 +17,10 @@ package eu.europa.ec.eudi.statium.misc
 
 import kotlinx.coroutines.CancellationException
 
-internal inline fun <R> runCatchingCancellable(block: () -> R): Result<R> =
-    try {
-        Result.success(block())
-    } catch (ce: CancellationException) {
-        throw ce
-    } catch (e: Exception) {
-        Result.failure(e)
-    }
+internal inline fun <R> runCatchingCancellable(block: () -> R): Result<R> = try {
+    Result.success(block())
+} catch (ce: CancellationException) {
+    throw ce
+} catch (e: Exception) {
+    Result.failure(e)
+}

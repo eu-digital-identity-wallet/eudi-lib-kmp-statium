@@ -32,16 +32,15 @@ public fun interface ReadStatus {
          * Creates a [ReadStatus] instance, for a [statusList] that is represented as a [ByteArray]
          * The [statusList] is assumed base64 URL safe decoded and decompressed
          */
-        public fun fromByteArray(bitsPerStatus: BitsPerStatus, statusList: ByteArray): ReadStatus =
-            ReadStatus { index ->
-                runCatchingCancellable {
-                    with(bitsPerStatus) {
-                        val (bytePosition, bitPosition) = byteAndBitPosition(index)
-                        val byte = statusList[bytePosition]
-                        readStatusByte(byte, bitPosition).getOrThrow()
-                    }
+        public fun fromByteArray(bitsPerStatus: BitsPerStatus, statusList: ByteArray): ReadStatus = ReadStatus { index ->
+            runCatchingCancellable {
+                with(bitsPerStatus) {
+                    val (bytePosition, bitPosition) = byteAndBitPosition(index)
+                    val byte = statusList[bytePosition]
+                    readStatusByte(byte, bitPosition).getOrThrow()
                 }
             }
+        }
 
         /**
          * Creates a [ReadStatus] instance, for a [statusList], given a [Decompress] function
@@ -49,11 +48,10 @@ public fun interface ReadStatus {
         public suspend fun fromStatusList(
             statusList: StatusList,
             decompress: Decompress = platformDecompress(),
-        ): Result<ReadStatus> =
-            runCatchingCancellable {
-                val decompressedList = decompress(statusList.compressedList)
-                fromByteArray(statusList.bytesPerStatus, decompressedList)
-            }
+        ): Result<ReadStatus> = runCatchingCancellable {
+            val decompressedList = decompress(statusList.compressedList)
+            fromByteArray(statusList.bytesPerStatus, decompressedList)
+        }
     }
 }
 

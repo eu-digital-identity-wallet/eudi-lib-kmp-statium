@@ -61,16 +61,14 @@ public fun interface ParseCwt<out ProtectedHeader, out Payload> {
 
 internal object ParseCwtUsingKotlinx : ParseCwt<ByteArray, ByteArray> {
 
-    override suspend fun invoke(input: ByteArray): CoseProtectedHeaderAndPayload<ByteArray, ByteArray> {
-        return parseCoseSign1(input)
-    }
+    override suspend fun invoke(input: ByteArray): CoseProtectedHeaderAndPayload<ByteArray, ByteArray> = parseCoseSign1(input)
 
     private val parseCoseSign1: ParseCwt<ByteArray, ByteArray> = ParseCwt { input ->
         /**
          * In this context, we don't care about the protected header
          */
         @Serializable
-        class CoseUnprotectedHeader()
+        class CoseUnprotectedHeader
 
         @Serializable
         @CborArray
