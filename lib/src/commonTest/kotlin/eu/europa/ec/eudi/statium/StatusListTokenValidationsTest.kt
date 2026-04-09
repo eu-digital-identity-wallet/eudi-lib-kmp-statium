@@ -233,12 +233,11 @@ class StatusListTokenValidationsTest : StatusListTokenValidations {
         issuedAt: Instant = now,
         expirationTime: Instant? = null,
         timeToLive: PositiveDurationAsSeconds? = null,
-    ): StatusListTokenClaims =
-        StatusListTokenClaims(
-            subject = subject,
-            issuedAt = issuedAt,
-            expirationTime = expirationTime,
-            timeToLive = timeToLive,
-            statusList = sampleStatusList,
-        )
+    ): StatusListTokenClaims = StatusListTokenClaims(
+        subject = subject,
+        issuedAt = issuedAt,
+        expirationTime = expirationTime,
+        timeToLive = timeToLive,
+        statusList = sampleStatusList,
+    )
 }

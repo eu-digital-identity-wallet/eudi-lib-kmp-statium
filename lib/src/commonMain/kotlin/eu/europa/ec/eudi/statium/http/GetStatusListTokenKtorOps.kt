@@ -49,40 +49,37 @@ public interface GetStatusListTokenKtorOps {
         uri: String,
         format: StatusListTokenFormat,
         at: Instant?,
-    ): Result<GetStatusListTokenResponse> =
-        runCatchingCancellable {
-            val httpResponse = get(uri) {
-                accept(format.contentType())
-                at?.let { parameter(TokenStatusListSpec.TIME, it.epochSeconds) }
-            }
-            when {
-                httpResponse.status.isSuccess() ->
-                    when (format) {
-                        StatusListTokenFormat.JWT -> httpResponse.bodyAsText().asJwt()
-                        StatusListTokenFormat.CWT -> httpResponse.bodyAsBytes().asCwt()
-                    }
-
-                else -> error("Got status ${httpResponse.status} while calling $uri")
-            }
+    ): Result<GetStatusListTokenResponse> = runCatchingCancellable {
+        val httpResponse = get(uri) {
+            accept(format.contentType())
+            at?.let { parameter(TokenStatusListSpec.TIME, it.epochSeconds) }
         }
+        when {
+            httpResponse.status.isSuccess() ->
+                when (format) {
+                    StatusListTokenFormat.JWT -> httpResponse.bodyAsText().asJwt()
+                    StatusListTokenFormat.CWT -> httpResponse.bodyAsBytes().asCwt()
+                }
+
+            else -> error("Got status ${httpResponse.status} while calling $uri")
+        }
+    }
 
     public suspend fun HttpClient.getStatusListTokenInJwt(
         uri: String,
         at: Instant?,
-    ): Result<String> =
-        getStatusListToken(uri, StatusListTokenFormat.JWT, at).map { response ->
-            check(response is GetStatusListTokenResponse.Jwt) { "Expected JWT, got $response" }
-            response.value
-        }
+    ): Result<String> = getStatusListToken(uri, StatusListTokenFormat.JWT, at).map { response ->
+        check(response is GetStatusListTokenResponse.Jwt) { "Expected JWT, got $response" }
+        response.value
+    }
 
     public suspend fun HttpClient.getStatusListTokenInCwt(
         uri: String,
         at: Instant?,
-    ): Result<ByteArray> =
-        getStatusListToken(uri, StatusListTokenFormat.CWT, at).map { response ->
-            check(response is GetStatusListTokenResponse.Cwt) { "Expected JWT, got $response" }
-            response.value
-        }
+    ): Result<ByteArray> = getStatusListToken(uri, StatusListTokenFormat.CWT, at).map { response ->
+        check(response is GetStatusListTokenResponse.Cwt) { "Expected JWT, got $response" }
+        response.value
+    }
 
     public companion object : GetStatusListTokenKtorOps {
 

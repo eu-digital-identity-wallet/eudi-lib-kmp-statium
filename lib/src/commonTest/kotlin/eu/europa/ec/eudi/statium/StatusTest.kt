@@ -27,16 +27,14 @@ class StatusTest {
      * Generates a random byte that satisfies Status.isApplicationSpecific()
      * This will either return 0x03 or a value in the range 0x0B..0x0F
      */
-    private fun generateRandomApplicationSpecificByte(): UByte {
-        return if (Random.nextBoolean()) {
-            // Return STATUS_APPLICATION_SPECIFIC (0x03)
-            TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC
-        } else {
-            // Return a random value in the application-specific range (0x0B..0x0F)
-            val rangeStart = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START.toInt()
-            val rangeEnd = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END.toInt()
-            Random.nextInt(rangeStart, rangeEnd + 1).toUByte()
-        }
+    private fun generateRandomApplicationSpecificByte(): UByte = if (Random.nextBoolean()) {
+        // Return STATUS_APPLICATION_SPECIFIC (0x03)
+        TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC
+    } else {
+        // Return a random value in the application-specific range (0x0B..0x0F)
+        val rangeStart = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START.toInt()
+        val rangeEnd = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END.toInt()
+        Random.nextInt(rangeStart, rangeEnd + 1).toUByte()
     }
 
     @Test

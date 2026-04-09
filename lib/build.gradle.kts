@@ -24,11 +24,15 @@ repositories {
 
 kotlin {
     explicitApiWarning()
-    jvmToolchain(libs.versions.java.get().toInt())
+    jvmToolchain(
+        libs.versions.java
+            .get()
+            .toInt(),
+    )
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_2_1
+        apiVersion = KotlinVersion.DEFAULT
         optIn =
             listOf(
                 "kotlinx.serialization.ExperimentalSerializationApi",
@@ -49,7 +53,8 @@ kotlin {
     androidTarget {
         // Set JVM target to 17 to match Java compatibility
         // Using direct property access instead of deprecated kotlinOptions
-        JvmTarget.fromTarget(libs.versions.java.get())
+        JvmTarget
+            .fromTarget(libs.versions.java.get())
             .let { javaTarget ->
                 compilations.all {
                     compileTaskProvider.configure {
@@ -123,8 +128,12 @@ android {
     }
 
     compileOptions {
-        JavaVersion.toVersion(libs.versions.java.get().toInt())
-            .let { javaVersion ->
+        JavaVersion
+            .toVersion(
+                libs.versions.java
+                    .get()
+                    .toInt(),
+            ).let { javaVersion ->
                 sourceCompatibility = javaVersion
                 targetCompatibility = javaVersion
             }
@@ -185,7 +194,6 @@ mavenPublishing {
         KotlinMultiplatform(
             javadocJar = JavadocJar.Dokka(tasks.dokkaGeneratePublicationHtml),
             sourcesJar = true,
-            androidVariantsToPublish = listOf("release"),
         ),
     )
 
@@ -205,7 +213,10 @@ mavenPublishing {
 
 dependencyCheck {
     formats = listOf("XML", "HTML")
-    nvd.apiKey = System.getenv("NVD_API_KEY") ?: properties["nvdApiKey"]?.toString() ?: ""
-    nvd.delay = 10000
-    nvd.maxRetryCount = 2
+
+    nvd {
+        apiKey = System.getenv("NVD_API_KEY") ?: properties["nvdApiKey"]?.toString() ?: ""
+        delay = 10000
+        maxRetryCount = 2
+    }
 }
