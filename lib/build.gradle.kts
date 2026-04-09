@@ -1,5 +1,5 @@
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinMultiplatform
+@file:Suppress("UnstableApiUsage")
+
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -190,12 +190,7 @@ dokka {
 }
 
 mavenPublishing {
-    configure(
-        KotlinMultiplatform(
-            javadocJar = JavadocJar.Dokka(tasks.dokkaGeneratePublicationHtml),
-            sourcesJar = true,
-        ),
-    )
+    configureBasedOnAppliedPlugins(sourcesJar = true, javadocJar = true)
 
     coordinates(
         groupId = group.toString(),
