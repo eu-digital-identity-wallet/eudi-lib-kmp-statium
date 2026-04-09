@@ -28,7 +28,7 @@ kotlin {
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_2_2
+        apiVersion = KotlinVersion.DEFAULT
         optIn =
             listOf(
                 "kotlinx.serialization.ExperimentalSerializationApi",
