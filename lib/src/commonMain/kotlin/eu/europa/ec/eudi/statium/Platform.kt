@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.misc.Compress
 import eu.europa.ec.eudi.statium.misc.Decompress
+import io.ktor.client.HttpClient
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -37,3 +38,5 @@ internal fun platformDecompress(): Decompress = platformDecompress(platformIoCon
 internal expect fun platformCompress(context: CoroutineContext): Compress
 
 internal fun platformCompress(): Compress = platformCompress(platformIoContext())
+
+internal expect fun createHttpClient(): HttpClient
