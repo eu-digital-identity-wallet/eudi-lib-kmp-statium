@@ -17,6 +17,7 @@ package eu.europa.ec.eudi.statium.misc
 
 import eu.europa.ec.eudi.statium.BitsPerStatus
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals

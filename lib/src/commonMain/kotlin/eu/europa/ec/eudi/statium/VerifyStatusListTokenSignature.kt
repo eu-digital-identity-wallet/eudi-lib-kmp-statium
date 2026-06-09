@@ -28,7 +28,7 @@ public fun interface VerifyStatusListTokenJwtSignature {
     ): Result<Unit>
 
     public companion object {
-        internal val Ignore: VerifyStatusListTokenJwtSignature = VerifyStatusListTokenJwtSignature { _, _ ->
+        public val Ignore: VerifyStatusListTokenJwtSignature = VerifyStatusListTokenJwtSignature { _, _ ->
             Result.success(Unit)
         }
     }
@@ -45,7 +45,7 @@ public fun interface VerifyStatusListTokenCwtSignature {
     ): Result<Unit>
 
     public companion object {
-        internal val Ignore: VerifyStatusListTokenCwtSignature = VerifyStatusListTokenCwtSignature { _, _ ->
+        public val Ignore: VerifyStatusListTokenCwtSignature = VerifyStatusListTokenCwtSignature { _, _ ->
             Result.success(Unit)
         }
     }

@@ -25,3 +25,6 @@ gradle-app.setting
 build
 local.properties
 .kotlin
+
+# macOS
+.DS_Store
