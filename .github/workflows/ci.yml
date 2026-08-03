@@ -21,7 +21,7 @@ jobs:
           distribution: temurin
           java-version: '17'
           architecture: x64
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
         with:
           cache-provider: basic
       - name: Build with Gradle
@@ -44,7 +44,7 @@ jobs:
           distribution: temurin
           java-version: '17'
           architecture: x64
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
         with:
           cache-provider: basic
       - name: Publish with Gradle
