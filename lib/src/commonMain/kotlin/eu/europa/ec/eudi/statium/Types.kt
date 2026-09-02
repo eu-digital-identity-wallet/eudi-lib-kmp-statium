@@ -67,7 +67,7 @@ public enum class BitsPerStatus(public val bits: Int) {
 @JvmInline
 public value class StatusIndex(public val value: Int) {
     init {
-        require(value >= 0) { "The value MUST be a non-negative number, zero or greater.: $value" }
+        require(value >= 0) { "The value MUST be a non-negative number, zero or greater." }
     }
 
     public override fun toString(): String = value.toString()
@@ -316,7 +316,7 @@ public sealed interface Status : Comparable<Status> {
                 BitsPerStatus.Eight -> 255u
             }
             require(statusValue <= maxValue) {
-                "Status $statusValue cannot be represented with ${bitsPerStatus.bits} bits"
+                "Status cannot be represented with the selected number of bits"
             }
             Status(statusValue)
         }
