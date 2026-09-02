@@ -183,7 +183,7 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
         val exception = assertFailsWith<IllegalStateException> {
             result.getOrThrow()
         }
-        assertEquals("Got status 500 Internal Server Error while calling https://example.com/status", exception.message)
+        assertEquals("Got status 500 Internal Server Error while trying to fetch Status List Token", exception.message)
     }
 
     @Test
@@ -219,6 +219,6 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
         val exception = assertFailsWith<IllegalStateException> {
             result.getOrThrow()
         }
-        assertEquals("Got status 404 Not Found while calling https://example.com/status", exception.message)
+        assertEquals("Got status 404 Not Found while trying to fetch Status List Token", exception.message)
     }
 }

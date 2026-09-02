@@ -34,7 +34,7 @@ public interface StatusListTokenValidations {
     public fun StatusListTokenClaims.ensureIssuedBefore(validationTime: Instant, allowedClockSkew: Duration): StatusListTokenClaims = apply {
         val adjustedValidationTime = validationTime + allowedClockSkew
         check(issuedAt <= adjustedValidationTime) {
-            "Status list token issued ($issuedAt) after validation time: $validationTime (with clock skew: $allowedClockSkew)"
+            "Status list token issued after validation time"
         }
     }
 
@@ -42,14 +42,14 @@ public interface StatusListTokenValidations {
         if (expirationTime != null) {
             val adjustedValidationTime = validationTime - allowedClockSkew
             check(expirationTime >= adjustedValidationTime) {
-                "Status list token expired ($expirationTime) for validation time: $validationTime (with clock skew: $allowedClockSkew)"
+                "Status list token expired before validation time"
             }
         }
     }
 
     public fun StatusListTokenClaims.ensureSubject(expectedSubject: String): StatusListTokenClaims = apply {
         check(expectedSubject == subject) {
-            "Wrong `${RFC7519.SUBJECT}` claim. Expected: `$expectedSubject`, actual: `$subject`"
+            "Wrong `${RFC7519.SUBJECT}` claim."
         }
     }
 

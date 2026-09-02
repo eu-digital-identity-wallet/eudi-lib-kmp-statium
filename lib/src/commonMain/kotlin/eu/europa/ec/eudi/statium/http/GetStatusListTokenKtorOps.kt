@@ -61,7 +61,7 @@ public interface GetStatusListTokenKtorOps {
                     StatusListTokenFormat.CWT -> httpResponse.bodyAsBytes().asCwt()
                 }
 
-            else -> error("Got status ${httpResponse.status} while calling $uri")
+            else -> error("Got status ${httpResponse.status} while trying to fetch Status List Token")
         }
     }
 
@@ -69,7 +69,7 @@ public interface GetStatusListTokenKtorOps {
         uri: String,
         at: Instant?,
     ): Result<String> = getStatusListToken(uri, StatusListTokenFormat.JWT, at).map { response ->
-        check(response is GetStatusListTokenResponse.Jwt) { "Expected JWT, got $response" }
+        check(response is GetStatusListTokenResponse.Jwt) { "Expected JWT, got ${response::class}" }
         response.value
     }
 
@@ -77,7 +77,7 @@ public interface GetStatusListTokenKtorOps {
         uri: String,
         at: Instant?,
     ): Result<ByteArray> = getStatusListToken(uri, StatusListTokenFormat.CWT, at).map { response ->
-        check(response is GetStatusListTokenResponse.Cwt) { "Expected JWT, got $response" }
+        check(response is GetStatusListTokenResponse.Cwt) { "Expected JWT, got ${response::class}" }
         response.value
     }
 
