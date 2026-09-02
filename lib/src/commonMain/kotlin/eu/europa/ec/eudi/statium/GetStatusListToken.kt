@@ -106,7 +106,7 @@ internal class GetStatusListTokenUsingJwt(
         }
         val expectedType = TokenStatusListSpec.MEDIA_SUBTYPE_STATUS_LIST_JWT
         check(type == expectedType) {
-            "Wrong `typ` claim in JOSE header"
+            "Wrong `typ` expecting $expectedType found $type"
         }
     }
 
@@ -160,7 +160,7 @@ internal class GetStatusListTokenUsingCwt(
         }
         val expectedType = TokenStatusListSpec.MEDIA_TYPE_APPLICATION_STATUS_LIST_CWT
         check(type == expectedType) {
-            "Wrong `type (16)` in COSE header"
+            "Wrong `type (16)` expecting $expectedType found $type"
         }
     }
 
