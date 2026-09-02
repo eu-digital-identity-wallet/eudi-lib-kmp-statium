@@ -43,13 +43,15 @@ public fun interface ReadStatus {
         }
 
         /**
-         * Creates a [ReadStatus] instance, for a [statusList], given a [Decompress] function
+         * Creates a [ReadStatus] instance, for a [statusList], given a [Decompress] function. The Status List
+         * can decompress up to [maximumDecompressedSize] bytes.
          */
         public suspend fun fromStatusList(
             statusList: StatusList,
             decompress: Decompress = platformDecompress(),
+            maximumDecompressedSize: UInt = Decompress.DEFAULT_MAXIMUM_DECOMPRESSED_SIZE,
         ): Result<ReadStatus> = runCatchingCancellable {
-            val decompressedList = decompress(statusList.compressedList)
+            val decompressedList = decompress(statusList.compressedList, maximumDecompressedSize)
             fromByteArray(statusList.bytesPerStatus, decompressedList)
         }
     }

@@ -20,6 +20,8 @@ import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.util.zip.DeflaterOutputStream
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class JvmAndroidDecompressTest {
 
@@ -44,5 +46,14 @@ class JvmAndroidDecompressTest {
             deflaterStream.finish()
         }
         return outputStream.toByteArray()
+    }
+
+    @Test
+    fun `decompress fails when decompresses array exceeds maximum allowed size`() = runTest {
+        val originalData = "Hello, this is a test of ZLIB compression and decompression!".encodeToByteArray()
+        val compressedData = compressWithZlib(originalData)
+        val decompress = JvmAndroidDecompress(coroutineContext)
+        val exception = assertFailsWith<IllegalStateException> { decompress(compressedData, 16u) }
+        assertEquals("Decompressed ByteArray exceeds maximum allowed size", exception.message)
     }
 }
