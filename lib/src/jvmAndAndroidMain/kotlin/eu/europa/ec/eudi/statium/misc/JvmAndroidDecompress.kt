@@ -33,16 +33,35 @@ internal class JvmAndroidDecompress(private val context: CoroutineContext = Disp
      * Decompresses the given byte array using ZLIB/DEFLATE.
      *
      * @param bytes The compressed byte array
+     * @param maximumDecompressedSize The maximum allowed decompressed size, in bytes
      * @return The decompressed byte array
      * @throws Exception if decompression fails
      */
-    override suspend fun invoke(bytes: CompressedByteArray): ByteArray = withContext(context) {
+    override suspend fun invoke(
+        bytes: CompressedByteArray,
+        maximumDecompressedSize: UInt,
+    ): ByteArray = withContext(context) {
+        require(maximumDecompressedSize > 0u) {
+            "maximumDecompressedSize must be greater than zero"
+        }
+
         ByteArrayInputStream(bytes).use { inputStream ->
             val inflater = Inflater(false)
             try {
                 InflaterInputStream(inputStream, inflater).use { inflaterStream ->
                     ByteArrayOutputStream().use { outputStream ->
-                        inflaterStream.copyTo(outputStream)
+                        var decompressedSize = 0
+                        val buffer = ByteArray(BUFFER_SIZE)
+                        do {
+                            check(decompressedSize <= maximumDecompressedSize.toInt()) {
+                                "Decompressed ByteArray exceeds maximum allowed size"
+                            }
+                            val read = inflaterStream.read(buffer)
+                            if (-1 != read) {
+                                outputStream.write(buffer, 0, read)
+                                decompressedSize += read
+                            }
+                        } while (-1 != read)
                         outputStream.toByteArray()
                     }
                 }
@@ -50,5 +69,12 @@ internal class JvmAndroidDecompress(private val context: CoroutineContext = Disp
                 inflater.end()
             }
         }
+    }
+
+    private companion object {
+        /**
+         * Size used for buffers during decompression i.e., 8KB.
+         */
+        private const val BUFFER_SIZE: Int = 8192
     }
 }
