@@ -28,23 +28,27 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [Decompress] for JVM and Android platforms using Java's built-in
  * zip utilities.
  */
-internal class JvmAndroidDecompress(private val context: CoroutineContext = Dispatchers.IO) : Decompress {
+internal class JvmAndroidDecompress(
+    private val context: CoroutineContext = Dispatchers.IO,
+    private val maximumDecompressedSize: UInt,
+) : Decompress {
+
+    init {
+        require(maximumDecompressedSize > 0u) {
+            "maximumDecompressedSize must be greater than zero"
+        }
+    }
+
     /**
      * Decompresses the given byte array using ZLIB/DEFLATE.
      *
      * @param bytes The compressed byte array
-     * @param maximumDecompressedSize The maximum allowed decompressed size, in bytes
      * @return The decompressed byte array
      * @throws Exception if decompression fails
      */
     override suspend fun invoke(
         bytes: CompressedByteArray,
-        maximumDecompressedSize: UInt,
     ): ByteArray = withContext(context) {
-        require(maximumDecompressedSize > 0u) {
-            "maximumDecompressedSize must be greater than zero"
-        }
-
         ByteArrayInputStream(bytes).use { inputStream ->
             val inflater = Inflater(false)
             try {

@@ -21,25 +21,13 @@ import eu.europa.ec.eudi.statium.CompressedByteArray
  * The byte array is compressed using DEFLATE RFC1951 with the ZLIB RFC1950 data format.
  * Implementations are RECOMMENDED to use the highest compression level available
  */
-public interface Decompress {
+public fun interface Decompress {
 
     /**
      * Decompresses the given byte array using ZLIB/DEFLATE.
      *
      * @param bytes The compressed byte array
-     * @param maximumDecompressedSize The maximum allowed decompressed size in bytes; Defaults to [DEFAULT_MAXIMUM_DECOMPRESSED_SIZE]
      * @return The decompressed byte array
-     * @throws Exception if decompression fails
      */
-    public suspend operator fun invoke(
-        bytes: CompressedByteArray,
-        maximumDecompressedSize: UInt = DEFAULT_MAXIMUM_DECOMPRESSED_SIZE,
-    ): ByteArray
-
-    public companion object {
-        /**
-         * The default maximum allowed decompression size i.e., 16MB.
-         */
-        public const val DEFAULT_MAXIMUM_DECOMPRESSED_SIZE: UInt = 16777216u
-    }
+    public suspend operator fun invoke(bytes: CompressedByteArray): ByteArray
 }

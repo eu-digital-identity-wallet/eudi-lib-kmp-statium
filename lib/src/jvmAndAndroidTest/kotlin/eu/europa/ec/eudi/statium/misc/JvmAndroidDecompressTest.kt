@@ -15,6 +15,7 @@
  */
 package eu.europa.ec.eudi.statium.misc
 
+import eu.europa.ec.eudi.statium.DEFAULT_MAXIMUM_DECOMPRESSED_SIZE
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -29,7 +30,7 @@ class JvmAndroidDecompressTest {
     fun testDecompress() = runTest {
         val originalData = "Hello, this is a test of ZLIB compression and decompression!".encodeToByteArray()
         val compressedData = compressWithZlib(originalData)
-        val decompress = JvmAndroidDecompress(coroutineContext)
+        val decompress = JvmAndroidDecompress(coroutineContext, DEFAULT_MAXIMUM_DECOMPRESSED_SIZE)
         val decompressedData = decompress(compressedData)
 
         // Verify the decompressed data matches the original
@@ -52,8 +53,8 @@ class JvmAndroidDecompressTest {
     fun `decompress fails when decompresses array exceeds maximum allowed size`() = runTest {
         val originalData = "Hello, this is a test of ZLIB compression and decompression!".encodeToByteArray()
         val compressedData = compressWithZlib(originalData)
-        val decompress = JvmAndroidDecompress(coroutineContext)
-        val exception = assertFailsWith<IllegalStateException> { decompress(compressedData, 16u) }
+        val decompress = JvmAndroidDecompress(coroutineContext, 16u)
+        val exception = assertFailsWith<IllegalStateException> { decompress(compressedData) }
         assertEquals("Decompressed ByteArray exceeds maximum allowed size", exception.message)
     }
 }

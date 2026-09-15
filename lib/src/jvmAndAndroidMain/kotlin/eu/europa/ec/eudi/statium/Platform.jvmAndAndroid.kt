@@ -24,6 +24,6 @@ import kotlin.coroutines.CoroutineContext
 
 internal actual fun platformIoContext(): CoroutineContext = Dispatchers.IO
 
-internal actual fun platformDecompress(context: CoroutineContext): Decompress = JvmAndroidDecompress(context)
+internal actual fun platformDecompress(context: CoroutineContext, maximumDecompressedSize: UInt): Decompress = JvmAndroidDecompress(context, maximumDecompressedSize)
 
 internal actual fun platformCompress(context: CoroutineContext): Compress = JvmAndAndroidCompress(context)

@@ -74,6 +74,6 @@ private fun doTest(expectedStatus: Status, statusReference: StatusReference, clo
 private fun CoroutineScope.getStatus(clock: Clock, httpClient: HttpClient): GetStatus {
     val verifySignature = VerifyStatusListTokenJwtSignature.Ignore
     val getStatusListToken = GetStatusListToken.usingJwt(clock, httpClient, verifySignature, kotlin.time.Duration.ZERO)
-    val decompress = platformDecompress(coroutineContext)
+    val decompress = platformDecompress(coroutineContext, DEFAULT_MAXIMUM_DECOMPRESSED_SIZE)
     return GetStatus(getStatusListToken, decompress)
 }
