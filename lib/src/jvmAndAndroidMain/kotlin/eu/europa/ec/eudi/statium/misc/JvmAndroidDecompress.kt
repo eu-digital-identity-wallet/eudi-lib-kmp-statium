@@ -30,12 +30,15 @@ import kotlin.coroutines.CoroutineContext
  */
 internal class JvmAndroidDecompress(
     private val context: CoroutineContext = Dispatchers.IO,
-    private val maximumDecompressedSize: UInt,
+    private val maximumDecompressedSize: Int,
 ) : Decompress {
 
     init {
-        require(maximumDecompressedSize > 0u) {
+        require(maximumDecompressedSize > 0) {
             "maximumDecompressedSize must be greater than zero"
+        }
+        require(maximumDecompressedSize <= Int.MAX_VALUE) {
+            "maximumDecompressedSize must not exceed ${Int.MAX_VALUE} bytes"
         }
     }
 
@@ -57,13 +60,13 @@ internal class JvmAndroidDecompress(
                         var decompressedSize = 0
                         val buffer = ByteArray(BUFFER_SIZE)
                         do {
-                            check(decompressedSize <= maximumDecompressedSize.toInt()) {
-                                "Decompressed ByteArray exceeds maximum allowed size"
-                            }
                             val read = inflaterStream.read(buffer)
                             if (-1 != read) {
-                                outputStream.write(buffer, 0, read)
                                 decompressedSize += read
+                                check(decompressedSize <= maximumDecompressedSize) {
+                                    "Decompressed ByteArray exceeds maximum allowed size"
+                                }
+                                outputStream.write(buffer, 0, read)
                             }
                         } while (-1 != read)
                         outputStream.toByteArray()

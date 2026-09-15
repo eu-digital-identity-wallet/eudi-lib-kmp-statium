@@ -22,7 +22,7 @@ import kotlin.coroutines.CoroutineContext
 /*
 * The default maximum allowed decompression size i.e., 16MB.
 */
-public const val DEFAULT_MAXIMUM_DECOMPRESSED_SIZE: UInt = 16777216u
+public const val DEFAULT_MAXIMUM_DECOMPRESSED_SIZE: Int = 16777216
 
 /**
  * Returns a platform-specific CoroutineContext suitable for IO operations
@@ -34,7 +34,7 @@ internal expect fun platformIoContext(): CoroutineContext
  *
  * @param maximumDecompressedSize The maximum allowed decompressed size in bytes; Defaults to [DEFAULT_MAXIMUM_DECOMPRESSED_SIZE]
  */
-internal expect fun platformDecompress(context: CoroutineContext, maximumDecompressedSize: UInt): Decompress
+internal expect fun platformDecompress(context: CoroutineContext, maximumDecompressedSize: Int): Decompress
 
 /**
  * Creates a platform-specific Decompress implementation with the default IO context with a 16MB limit

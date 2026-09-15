@@ -53,7 +53,7 @@ class JvmAndroidDecompressTest {
     fun `decompress fails when decompresses array exceeds maximum allowed size`() = runTest {
         val originalData = "Hello, this is a test of ZLIB compression and decompression!".encodeToByteArray()
         val compressedData = compressWithZlib(originalData)
-        val decompress = JvmAndroidDecompress(coroutineContext, 16u)
+        val decompress = JvmAndroidDecompress(coroutineContext, 16)
         val exception = assertFailsWith<IllegalStateException> { decompress(compressedData) }
         assertEquals("Decompressed ByteArray exceeds maximum allowed size", exception.message)
     }
