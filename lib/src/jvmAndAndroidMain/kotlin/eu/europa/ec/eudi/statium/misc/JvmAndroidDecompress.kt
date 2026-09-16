@@ -28,7 +28,20 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [Decompress] for JVM and Android platforms using Java's built-in
  * zip utilities.
  */
-internal class JvmAndroidDecompress(private val context: CoroutineContext = Dispatchers.IO) : Decompress {
+internal class JvmAndroidDecompress(
+    private val context: CoroutineContext = Dispatchers.IO,
+    private val maximumDecompressedSize: Int,
+) : Decompress {
+
+    init {
+        require(maximumDecompressedSize > 0) {
+            "maximumDecompressedSize must be greater than zero"
+        }
+        require(maximumDecompressedSize <= Int.MAX_VALUE) {
+            "maximumDecompressedSize must not exceed ${Int.MAX_VALUE} bytes"
+        }
+    }
+
     /**
      * Decompresses the given byte array using ZLIB/DEFLATE.
      *
@@ -36,13 +49,26 @@ internal class JvmAndroidDecompress(private val context: CoroutineContext = Disp
      * @return The decompressed byte array
      * @throws Exception if decompression fails
      */
-    override suspend fun invoke(bytes: CompressedByteArray): ByteArray = withContext(context) {
+    override suspend fun invoke(
+        bytes: CompressedByteArray,
+    ): ByteArray = withContext(context) {
         ByteArrayInputStream(bytes).use { inputStream ->
             val inflater = Inflater(false)
             try {
                 InflaterInputStream(inputStream, inflater).use { inflaterStream ->
                     ByteArrayOutputStream().use { outputStream ->
-                        inflaterStream.copyTo(outputStream)
+                        var decompressedSize = 0
+                        val buffer = ByteArray(BUFFER_SIZE)
+                        do {
+                            val read = inflaterStream.read(buffer)
+                            if (-1 != read) {
+                                decompressedSize += read
+                                check(decompressedSize <= maximumDecompressedSize) {
+                                    "Decompressed ByteArray exceeds maximum allowed size"
+                                }
+                                outputStream.write(buffer, 0, read)
+                            }
+                        } while (-1 != read)
                         outputStream.toByteArray()
                     }
                 }
@@ -50,5 +76,12 @@ internal class JvmAndroidDecompress(private val context: CoroutineContext = Disp
                 inflater.end()
             }
         }
+    }
+
+    private companion object {
+        /**
+         * Size used for buffers during decompression i.e., 8KB.
+         */
+        private const val BUFFER_SIZE: Int = 8192
     }
 }

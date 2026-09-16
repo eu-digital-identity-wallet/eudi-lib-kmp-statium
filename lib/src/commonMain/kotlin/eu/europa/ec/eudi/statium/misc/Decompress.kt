@@ -22,5 +22,12 @@ import eu.europa.ec.eudi.statium.CompressedByteArray
  * Implementations are RECOMMENDED to use the highest compression level available
  */
 public fun interface Decompress {
+
+    /**
+     * Decompresses the given byte array using ZLIB/DEFLATE.
+     *
+     * @param bytes The compressed byte array
+     * @return The decompressed byte array
+     */
     public suspend operator fun invoke(bytes: CompressedByteArray): ByteArray
 }

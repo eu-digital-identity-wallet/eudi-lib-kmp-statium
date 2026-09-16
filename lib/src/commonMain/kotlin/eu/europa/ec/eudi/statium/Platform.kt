@@ -19,6 +19,11 @@ import eu.europa.ec.eudi.statium.misc.Compress
 import eu.europa.ec.eudi.statium.misc.Decompress
 import kotlin.coroutines.CoroutineContext
 
+/*
+* The default maximum allowed decompression size i.e., 16MB.
+*/
+public const val DEFAULT_MAXIMUM_DECOMPRESSED_SIZE: Int = 16777216
+
 /**
  * Returns a platform-specific CoroutineContext suitable for IO operations
  */
@@ -26,13 +31,15 @@ internal expect fun platformIoContext(): CoroutineContext
 
 /**
  * Creates a platform-specific Decompress implementation
+ *
+ * @param maximumDecompressedSize The maximum allowed decompressed size in bytes; Defaults to [DEFAULT_MAXIMUM_DECOMPRESSED_SIZE]
  */
-internal expect fun platformDecompress(context: CoroutineContext): Decompress
+internal expect fun platformDecompress(context: CoroutineContext, maximumDecompressedSize: Int): Decompress
 
 /**
- * Creates a platform-specific Decompress implementation with the default IO context
+ * Creates a platform-specific Decompress implementation with the default IO context with a 16MB limit
  */
-internal fun platformDecompress(): Decompress = platformDecompress(platformIoContext())
+internal fun platformDecompress(): Decompress = platformDecompress(platformIoContext(), DEFAULT_MAXIMUM_DECOMPRESSED_SIZE)
 
 internal expect fun platformCompress(context: CoroutineContext): Compress
 
