@@ -17,6 +17,12 @@ package eu.europa.ec.eudi.statium.misc
 
 import kotlinx.coroutines.CancellationException
 
+/**
+ * Calls the specified [block] and returns its encapsulated result if invocation was successful,
+ * catching any [Exception] that was thrown from the block execution and encapsulating it as a failure.
+ *
+ * **It always re-rethrows [CancellationException], or [Error].**
+ */
 internal inline fun <R> runCatchingCancellable(block: () -> R): Result<R> = try {
     Result.success(block())
 } catch (ce: CancellationException) {

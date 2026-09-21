@@ -30,7 +30,9 @@ public fun interface ReadStatus {
 
         /**
          * Creates a [ReadStatus] instance, for a [statusList] that is represented as a [ByteArray]
-         * The [statusList] is assumed base64 URL safe decoded and decompressed
+         * The [statusList] is assumed base64 URL safe decoded and decompressed.
+         *
+         * **The new instance and its implementations always re-throw [kotlin.coroutines.cancellation.CancellationException], or [Error].**
          */
         public fun fromByteArray(bitsPerStatus: BitsPerStatus, statusList: ByteArray): ReadStatus = ReadStatus { index ->
             runCatchingCancellable {
@@ -43,7 +45,9 @@ public fun interface ReadStatus {
         }
 
         /**
-         * Creates a [ReadStatus] instance, for a [statusList], given a [Decompress] function
+         * Creates a [ReadStatus] instance, for a [statusList], given a [Decompress] function.
+         *
+         * The new instance and its implementations always re-throws [kotlin.coroutines.cancellation.CancellationException], or [Error].
          */
         public suspend fun fromStatusList(
             statusList: StatusList,

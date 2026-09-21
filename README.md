@@ -22,8 +22,6 @@ It implements the Token Status List Specification [draft 12](https://www.ietf.or
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
 
-> [!NOTE]
-> Currently, Statium supports JWT format for the Status List Token.
 
 ## Disclaimer
 
@@ -146,6 +144,7 @@ when (status) {
     is Status.Reserved -> println("Reserved status: ${status.value}")
 }
 ```
+
 ### Get Status
 
 As a `Relying Party` [fetch](#get-status-list-token) the corresponding `Status List Token` 
@@ -185,6 +184,20 @@ when (status) {
     is Status.Reserved -> println("Reserved status: ${status.value}")
 }
 ```
+
+### Handling of `Result`
+
+Statium provides many functions that return a `Result`.
+
+The returned `Result` encapsulates a value if the invocation was successful,
+and catches any `Exception` that was thrown encapsulating it as a failure.
+
+> [!IMPORTANT]
+> 
+> - `kotlinx.coroutines.CancellationException`
+> - `kotlin.Error`
+>
+> is never caught and is **always** re-thrown.
 
 ## How to contribute
 
