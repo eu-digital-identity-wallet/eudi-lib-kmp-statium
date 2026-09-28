@@ -49,7 +49,9 @@ public fun interface GetStatus {
     public companion object {
 
         /**
-         * Factory method for creating an instance of [GetStatus],
+         * Factory method for creating an instance of [GetStatus].
+         *
+         * **The new instance always re-throws [kotlin.coroutines.cancellation.CancellationException], or [Error].**
          *
          * @param getStatusListToken a way to fetch the Status List token
          * @param decompress a way to decompress the status list contents. If not provided defaults to [platformDecompress]

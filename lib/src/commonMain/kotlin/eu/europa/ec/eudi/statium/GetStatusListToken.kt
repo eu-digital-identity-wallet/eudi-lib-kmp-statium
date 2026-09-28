@@ -35,7 +35,9 @@ public fun interface GetStatusListToken {
     public companion object {
         /**
          * Factory method that creates an instance of [GetStatusListToken]
-         * that works with JWT encoded status list tokens
+         * that works with JWT encoded status list tokens.
+         *
+         * **The new instance and its implementations always re-throw [kotlin.coroutines.cancellation.CancellationException], or [Error].**
          */
         public fun usingJwt(
             clock: Clock,
@@ -51,7 +53,9 @@ public fun interface GetStatusListToken {
 
         /**
          * Factory method that creates an instance of [GetStatusListToken]
-         * that works with CWT encoded status list tokens
+         * that works with CWT encoded status list tokens.
+         *
+         * **The new instance and its implementations always re-throw [kotlin.coroutines.cancellation.CancellationException], or [Error].**
          */
         public fun usingCwt(
             clock: Clock,

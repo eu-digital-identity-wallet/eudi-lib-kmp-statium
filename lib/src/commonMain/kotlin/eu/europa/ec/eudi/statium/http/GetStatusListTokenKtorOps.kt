@@ -42,8 +42,10 @@ public interface GetStatusListTokenResponse {
 public interface GetStatusListTokenKtorOps {
 
     /**
-     * Retrieves the token status list given a [uri] and a [format]
-     * Optionally a [time in point][at] be specified
+     * Retrieves the token status list given a [uri] and a [format].
+     * Optionally a [time in point][at] be specified.
+     *
+     * **[kotlin.coroutines.cancellation.CancellationException], or [Error] is always re-thrown.**
      */
     public suspend fun HttpClient.getStatusListToken(
         uri: String,

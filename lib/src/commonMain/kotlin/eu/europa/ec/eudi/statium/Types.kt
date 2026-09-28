@@ -124,7 +124,9 @@ public data class StatusList(
 
         /**
          * Attempts to create a [StatusList]
-         * It just decodes the [base64UrlEncodedList]
+         * It just decodes the [base64UrlEncodedList].
+         *
+         * **[kotlin.coroutines.cancellation.CancellationException], or [Error] is always re-thrown.**
          *
          * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
          * @param base64UrlEncodedList The Base64 URL no padding encoded, compressed list
@@ -146,7 +148,7 @@ public data class StatusList(
          * @param bytesPerStatus  The number of bits per Referenced Token in the Status List
          * @param rawList The raw list (uncompressed)
          * @param aggregationUri  A URI to retrieve the Status List Aggregation for this type of Referenced Token or Issuer
-         *@return the status list
+         * @return the status list
          */
         public suspend fun fromRawBytes(
             bytesPerStatus: BitsPerStatus,
@@ -303,7 +305,9 @@ public sealed interface Status : Comparable<Status> {
 
         /**
          * Attempts to create a [Status].
-         * It will check that the given [statusValue] can be represented by the given [bitsPerStatus]
+         * It will check that the given [statusValue] can be represented by the given [bitsPerStatus].
+         *
+         * **[kotlin.coroutines.cancellation.CancellationException], or [Error] is always re-thrown.**
          *
          * @param bitsPerStatus the number of bits for representing the status
          * @param statusValue the value of the status
