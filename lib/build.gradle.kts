@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.spotless)
     alias(libs.plugins.dokka)
     alias(libs.plugins.maven.publish)
-    alias(libs.plugins.dependency.check)
 }
 
 repositories {
@@ -203,15 +202,5 @@ mavenPublishing {
             system = "github"
             url = "${project.properties["POM_SCM_URL"]}/actions"
         }
-    }
-}
-
-dependencyCheck {
-    formats = listOf("XML", "HTML")
-
-    nvd {
-        apiKey = System.getenv("NVD_API_KEY") ?: properties["nvdApiKey"]?.toString() ?: ""
-        delay = 10000
-        maxRetryCount = 2
     }
 }
