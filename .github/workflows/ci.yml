@@ -27,7 +27,7 @@ jobs:
       - name: Build with Gradle
         env:
           CI: true
-        run: ./gradlew clean build test
+        run: ./gradlew clean build allTests
       - id: extract
         name: Extract code version from gradle.properties
         run: echo "CODE_VERSION=$(awk -F= '$1~/version/{print $2}' gradle.properties)" >> $GITHUB_OUTPUT
