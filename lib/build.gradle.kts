@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.android.build.api.withAndroid
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -8,7 +9,7 @@ import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kover)
     alias(libs.plugins.spotless)
@@ -49,18 +50,18 @@ kotlin {
     jvm()
 
     // Android target
-    androidTarget {
+    android {
+        namespace = properties["namespace"].toString()
+        compileSdk = properties["android.compileSdk"].toString().toInt()
+        minSdk = properties["android.minSdk"].toString().toInt()
+
+        // Enable Android host-side (unit) tests
+        withHostTest {}
+
         // Set JVM target to 17 to match Java compatibility
-        // Using direct property access instead of deprecated kotlinOptions
-        JvmTarget
-            .fromTarget(libs.versions.java.get())
-            .let { javaTarget ->
-                compilations.all {
-                    compileTaskProvider.configure {
-                        compilerOptions.jvmTarget.set(javaTarget)
-                    }
-                }
-            }
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.get()))
+        }
     }
 
     // Set up targets
@@ -73,7 +74,7 @@ kotlin {
             group("jvmAndAndroid") {
                 // Provide which targets would be part of this group
                 withJvm()
-                withAndroidTarget()
+                withAndroid()
             }
         }
     }
@@ -108,34 +109,11 @@ kotlin {
             }
         }
 
-        androidUnitTest {
+        getByName("androidHostTest") {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
             }
         }
-    }
-}
-
-// Android configuration
-android {
-    namespace = properties["namespace"].toString()
-    group = properties["group"].toString()
-    compileSdk = properties["android.targetSdk"].toString().toInt()
-
-    defaultConfig {
-        minSdk = properties["android.minSdk"].toString().toInt()
-    }
-
-    compileOptions {
-        JavaVersion
-            .toVersion(
-                libs.versions.java
-                    .get()
-                    .toInt(),
-            ).let { javaVersion ->
-                sourceCompatibility = javaVersion
-                targetCompatibility = javaVersion
-            }
     }
 }
 
@@ -189,7 +167,7 @@ dokka {
 }
 
 mavenPublishing {
-    configureBasedOnAppliedPlugins(sourcesJar = true, javadocJar = true)
+    configureBasedOnAppliedPlugins()
 
     coordinates(
         groupId = group.toString(),
