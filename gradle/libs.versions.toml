@@ -1,15 +1,15 @@
 [versions]
 java = "17"
-kotlin = "2.4.20"
-androidGradlePlugin = "9.1.1"
-kotlinx-serialization = "1.11.0"
+kotlin = "2.4.21"
+androidGradlePlugin = "9.5.1"
+kotlinx-serialization = "1.12.0"
 kotlinx-coroutines = "1.11.0"
-ktor = "3.6.0"
+ktor = "3.6.1"
 maven-publish = "0.37.0"
-spotless = "8.4.0"
+spotless = "8.11.0"
 ktlint = "1.8.0"
 kover = "0.9.11"
-dokka = "2.2.0"
+dokka = "2.3.0"
 
 [libraries]
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
