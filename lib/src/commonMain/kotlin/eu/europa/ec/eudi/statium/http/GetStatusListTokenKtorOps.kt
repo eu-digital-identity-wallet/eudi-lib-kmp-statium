@@ -63,6 +63,12 @@ public interface GetStatusListTokenKtorOps {
                     StatusListTokenFormat.CWT -> httpResponse.bodyAsBytes().asCwt()
                 }
 
+            at != null && httpResponse.status == HttpStatusCode.NotFound ->
+                error(
+                    "Status List Token provider does not support historical resolution " +
+                        "for ${TokenStatusListSpec.TIME}=${at.epochSeconds}",
+                )
+
             else -> error("Got status ${httpResponse.status} while trying to fetch Status List Token")
         }
     }

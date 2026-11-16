@@ -227,6 +227,38 @@ class StatusListTokenValidationsTest : StatusListTokenValidations {
         assertEquals(claims, result)
     }
 
+    @Test
+    fun testEnsureCoversRequestedTimeSuccess() {
+        val claims = createClaims(issuedAt = past, expirationTime = future)
+        assertEquals(claims, claims.ensureCoversRequestedTime(now))
+        // Boundaries are inclusive
+        claims.ensureCoversRequestedTime(past)
+        claims.ensureCoversRequestedTime(future)
+    }
+
+    @Test
+    fun testEnsureCoversRequestedTimeWithoutExpiration() {
+        val claims = createClaims(issuedAt = past, expirationTime = null)
+        assertEquals(claims, claims.ensureCoversRequestedTime(now))
+    }
+
+    @Test
+    fun testEnsureCoversRequestedTimeFailsWhenIssuedAfterRequestedTime() {
+        // e.g. a CDN ignored the `time` query parameter and returned the latest status list
+        val claims = createClaims(issuedAt = now, expirationTime = future)
+        assertFailsWith<IllegalStateException> {
+            claims.ensureCoversRequestedTime(past)
+        }
+    }
+
+    @Test
+    fun testEnsureCoversRequestedTimeFailsWhenExpiredBeforeRequestedTime() {
+        val claims = createClaims(issuedAt = past, expirationTime = now)
+        assertFailsWith<IllegalStateException> {
+            claims.ensureCoversRequestedTime(future)
+        }
+    }
+
     // Helper method to create StatusListTokenClaims for testing
     private fun createClaims(
         subject: String = this.subject,

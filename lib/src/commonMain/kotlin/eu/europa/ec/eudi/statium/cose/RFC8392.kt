@@ -22,4 +22,9 @@ public object RFC8392 {
     public const val SUBJECT: Long = 2
     public const val ISSUED_AT: Long = 6
     public const val EXPIRATION_TIME: Long = 4
+
+    /**
+     * CBOR Tag for a CWT. It MUST NOT be used on Status List Tokens
+     */
+    public const val CWT_TAG: ULong = 61u
 }

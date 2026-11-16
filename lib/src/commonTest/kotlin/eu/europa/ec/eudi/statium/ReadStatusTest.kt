@@ -18,6 +18,7 @@ package eu.europa.ec.eudi.statium
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class ReadStatusTest {
 
@@ -170,6 +171,24 @@ class ReadStatusTest {
 
         assertFailsWith<IllegalArgumentException> {
             readStatus(-1).getOrThrow()
+        }
+    }
+
+    @Test
+    fun testOutOfBoundsIndexIsRejected() {
+        val byteArray = byteArrayOf(0x00, 0x00)
+        BitsPerStatus.entries.forEach { bitsPerStatus ->
+            val readStatus = ReadStatus.fromByteArray(bitsPerStatus, byteArray)
+            val capacity = byteArray.size * bitsPerStatus.statusesPerByte
+
+            // Last valid index
+            assertEquals(0, readStatus(capacity - 1).getOrNull())
+
+            // idx >= (bytes * 8) / bits MUST be rejected
+            val error = assertFailsWith<IllegalArgumentException>("$bitsPerStatus") {
+                readStatus(capacity).getOrThrow()
+            }
+            assertTrue(error.message!!.contains("out of bounds"), "$bitsPerStatus: ${error.message}")
         }
     }
 
