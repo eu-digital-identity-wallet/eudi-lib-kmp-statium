@@ -25,13 +25,13 @@ class StatusTest {
 
     /**
      * Generates a random byte that satisfies Status.isApplicationSpecific()
-     * This will either return 0x03 or a value in the range 0x0B..0x0F
+     * This will either return 0x03 or a value in the range 0x0C..0x0F
      */
     private fun generateRandomApplicationSpecificByte(): UByte = if (Random.nextBoolean()) {
         // Return STATUS_APPLICATION_SPECIFIC (0x03)
         TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC
     } else {
-        // Return a random value in the application-specific range (0x0B..0x0F)
+        // Return a random value in the application-specific range (0x0C..0x0F)
         val rangeStart = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START.toInt()
         val rangeEnd = TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END.toInt()
         Random.nextInt(rangeStart, rangeEnd + 1).toUByte()
@@ -115,7 +115,7 @@ class StatusTest {
         // Test exact match with STATUS_APPLICATION_SPECIFIC (0x03)
         assertTrue(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC))
 
-        // Test values in the application specific range (0x0B..0x0F)
+        // Test values in the application specific range (0x0C..0x0F)
         assertTrue(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_START))
         assertTrue(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_APPLICATION_SPECIFIC_RANGE_END))
         assertTrue(Status.isApplicationSpecific(0x0Cu))
@@ -133,6 +133,13 @@ class StatusTest {
     }
 
     @Test
+    fun testHex0BIsReserved() {
+        assertEquals(Status.Reserved(0x0Bu), Status(0x0Bu))
+        assertEquals(Status.Reserved(0x0Bu), Status(BitsPerStatus.Four, 0x0Bu).getOrThrow())
+        assertEquals(Status.ApplicationSpecific(0x0Cu), Status(BitsPerStatus.Four, 0x0Cu).getOrThrow())
+    }
+
+    @Test
     fun testIsApplicationSpecificUnhappyPath() {
         // Test standard status values
         assertFalse(Status.isApplicationSpecific(TokenStatusListSpec.STATUS_VALID))
@@ -142,6 +149,8 @@ class StatusTest {
         // Test values outside the application-specific range
         assertFalse(Status.isApplicationSpecific(0x04u))
         assertFalse(Status.isApplicationSpecific(0x0Au))
+        // 0x0B is reserved since draft-20
+        assertFalse(Status.isApplicationSpecific(0x0Bu))
         assertFalse(Status.isApplicationSpecific(0x10u))
     }
 }

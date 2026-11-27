@@ -47,6 +47,21 @@ public interface StatusListTokenValidations {
         }
     }
 
+    /**
+     * When a Status List Token is requested for a specific point in time (historical resolution),
+     * ensures that the returned token covers it, i.e. `iat <= requestedTime <= exp`.
+     */
+    public fun StatusListTokenClaims.ensureCoversRequestedTime(requestedTime: Instant): StatusListTokenClaims = apply {
+        check(issuedAt <= requestedTime) {
+            "Status list token was issued after the requested time; it does not cover the requested time"
+        }
+        if (expirationTime != null) {
+            check(requestedTime <= expirationTime) {
+                "Status list token expired before the requested time; it does not cover the requested time"
+            }
+        }
+    }
+
     public fun StatusListTokenClaims.ensureSubject(expectedSubject: String): StatusListTokenClaims = apply {
         check(expectedSubject == subject) {
             "Wrong `${RFC7519.SUBJECT}` claim."

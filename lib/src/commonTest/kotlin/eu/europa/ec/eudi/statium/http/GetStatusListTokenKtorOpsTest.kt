@@ -221,4 +221,31 @@ internal class GetStatusListTokenKtorOpsTest : GetStatusListTokenKtorOps {
         }
         assertEquals("Got status 404 Not Found while trying to fetch Status List Token", exception.message)
     }
+
+    @Test
+    fun testHistoricalResolutionNotSupportedReturning404() = runTest {
+        val testTime = Instant.fromEpochSeconds(1234567890)
+        val mockEngine = MockEngine { request ->
+            assertEquals("1234567890", request.url.parameters[TokenStatusListSpec.TIME])
+            respond(
+                content = "Not Found",
+                status = HttpStatusCode.NotFound,
+                headers = headersOf(HttpHeaders.ContentType, ContentType.Text.Plain.toString()),
+            )
+        }
+
+        val result = HttpClient(mockEngine).getStatusListToken(
+            "https://example.com/status",
+            StatusListTokenFormat.JWT,
+            testTime,
+        )
+
+        val exception = assertFailsWith<IllegalStateException> {
+            result.getOrThrow()
+        }
+        assertEquals(
+            "Status List Token provider does not support historical resolution for time=1234567890",
+            exception.message,
+        )
+    }
 }

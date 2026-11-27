@@ -16,10 +16,10 @@
 package eu.europa.ec.eudi.statium
 
 /**
- * [Token Status List](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-10.html)
+ * [Token Status List](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-20.html)
  */
 public object TokenStatusListSpec {
-    public const val VERSION: String = "draft-10"
+    public const val VERSION: String = "draft-20"
 
     public const val STATUS: String = "status"
     public const val STATUS_LIST: String = "status_list"
@@ -38,7 +38,7 @@ public object TokenStatusListSpec {
     public const val STATUS_INVALID: UByte = 0x01u
     public const val STATUS_SUSPENDED: UByte = 0x02u
     public const val STATUS_APPLICATION_SPECIFIC: UByte = 0x03u
-    public const val STATUS_APPLICATION_SPECIFIC_RANGE_START: UByte = 0x0Bu
+    public const val STATUS_APPLICATION_SPECIFIC_RANGE_START: UByte = 0x0Cu
     public const val STATUS_APPLICATION_SPECIFIC_RANGE_END: UByte = 0x0Fu
 
     public const val MEDIA_SUBTYPE_STATUS_LIST_JWT: String = "statuslist+jwt"

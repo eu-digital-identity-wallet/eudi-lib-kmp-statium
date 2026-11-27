@@ -18,7 +18,7 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 ## Overview
 
 Statium is a Kotlin multiplatform library supporting JVM and Android platforms. 
-It implements the Token Status List Specification [draft 12](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-12.html), 
+It implements the Token Status List Specification [draft 20](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-20.html), 
 and allows callers to check the status of a "Referenced Token" as defined in the specification, 
 effectively enabling applications to verify if tokens are valid, revoked, or in other states.
 

@@ -37,6 +37,11 @@ public fun interface ReadStatus {
         public fun fromByteArray(bitsPerStatus: BitsPerStatus, statusList: ByteArray): ReadStatus = ReadStatus { index ->
             runCatchingCancellable {
                 with(bitsPerStatus) {
+                    val capacity = statusList.size.toLong() * statusesPerByte
+                    require(index.value < capacity) {
+                        "Status index $index is out of bounds (status list holds $capacity statuses). " +
+                            "The Referenced Token MUST be rejected"
+                    }
                     val (bytePosition, bitPosition) = byteAndBitPosition(index)
                     val byte = statusList[bytePosition]
                     readStatusByte(byte, bitPosition).getOrThrow()

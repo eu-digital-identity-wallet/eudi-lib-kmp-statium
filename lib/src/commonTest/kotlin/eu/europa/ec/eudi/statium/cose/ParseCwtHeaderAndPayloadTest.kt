@@ -19,8 +19,10 @@ import eu.europa.ec.eudi.statium.GetStatusListTokenUsingCwt
 import eu.europa.ec.eudi.statium.StatusListTokenClaims
 import eu.europa.ec.eudi.statium.TokenStatusListSpec
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.SerializationException
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ParseCwtHeaderAndPayloadTest {
 
@@ -89,5 +91,33 @@ class ParseCwtHeaderAndPayloadTest {
 
         println(protectedHeader)
         println(statusListTokenClaims)
+    }
+    private val coseSign1Sample = """
+        d2845820a2012610781a6170706c69636174696f6e2f7374617475736c6973742b63
+        7774a1044231325850a502782168747470733a2f2f6578616d706c652e636f6d2f73
+        74617475736c697374732f31061a648c5bea041a8898dfea19fffe19a8c019fffda2
+        646269747301636c73744a78dadbb918000217015d584027d5535dfe0a33291cc9bf
+        b41053ad2493c49d1ee4635e12548a79bac92916845fee76799c42762f928441c5c3
+        44e3612381e0cf88f2f160b3e1f97728ec8403
+    """.trimIndent().replace("\n", "").hexToByteArray()
+
+    @Test
+    fun testCwtTag61IsRejected() = runTest {
+        // 61(18([...])) - Tag 61 MUST NOT be used on Status List Tokens
+        val input = byteArrayOf(0xD8.toByte(), RFC8392.CWT_TAG.toByte()) + coseSign1Sample
+        assertFailsWith<SerializationException> { parseCwt(input) }
+    }
+
+    @Test
+    fun testUntaggedCoseSign1IsRejected() = runTest {
+        val input = coseSign1Sample.copyOfRange(1, coseSign1Sample.size)
+        assertFailsWith<SerializationException> { parseCwt(input) }
+    }
+
+    @Test
+    fun testCoseMac0IsRejected() = runTest {
+        val input = byteArrayOf(0xD1.toByte()) + // tag 17 (COSE_Mac0)
+            coseSign1Sample.copyOfRange(1, coseSign1Sample.size)
+        assertFailsWith<SerializationException> { parseCwt(input) }
     }
 }

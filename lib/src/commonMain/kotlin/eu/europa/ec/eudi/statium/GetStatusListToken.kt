@@ -16,6 +16,7 @@
 package eu.europa.ec.eudi.statium
 
 import eu.europa.ec.eudi.statium.cose.ParseCwt
+import eu.europa.ec.eudi.statium.cose.RFC8392
 import eu.europa.ec.eudi.statium.http.GetStatusListTokenKtorOps
 import eu.europa.ec.eudi.statium.jose.jwtHeaderAndPayload
 import eu.europa.ec.eudi.statium.misc.runCatchingCancellable
@@ -93,6 +94,7 @@ internal class GetStatusListTokenUsingJwt(
         val (header, claims) = parse(unverifiedJwt)
         header.ensureTypeIsStatusListJwt()
         claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
+            .apply { at?.let { ensureCoversRequestedTime(it) } }
     }
 
     private suspend fun fetchToken(uri: String, at: Instant?): String = httpClient.getStatusListTokenInJwt(uri, at).getOrThrow()
@@ -143,15 +145,32 @@ internal class GetStatusListTokenUsingCwt(
 
     override suspend fun invoke(uri: String, at: Instant?): Result<StatusListTokenClaims> = runCatchingCancellable {
         val unverifiedCwt = fetchToken(uri, at)
+        unverifiedCwt.ensureNotTaggedAsCwt()
         val validationTime = at ?: clock.now()
         verifySignature(unverifiedCwt, validationTime)
         val (header, claims) = parseCwt(unverifiedCwt)
         checkNotNull(claims) { "Missing claims in CWT" }
         header.ensureTypeIsStatusListCwt()
         claims.ensureValid(expectedSubject = uri, validationTime, allowedClockSkew = allowedClockSkew)
+            .apply { at?.let { ensureCoversRequestedTime(it) } }
     }
 
     private suspend fun fetchToken(uri: String, at: Instant?): ByteArray = httpClient.getStatusListTokenInCwt(uri, at).getOrThrow()
+
+    /**
+     * Status List Tokens MUST NOT be wrapped with the CWT CBOR Tag (61) (§5.2).
+     * This function checks:
+     * 1. if the first two bytes are a tag with one byte tag number
+     * 2. The tag number that follows is not 61
+     */
+    private fun ByteArray.ensureNotTaggedAsCwt() {
+        val hasTagHeader = size >= 2
+        val isOneByteTag = hasTagHeader && this[0] == CBOR_ONE_BYTE_TAG
+        val tagNumberIsCwt = isOneByteTag && this[1] == RFC8392.CWT_TAG.toByte()
+        check(!tagNumberIsCwt) {
+            "CBOR tag ${RFC8392.CWT_TAG} (CWT) is not allowed on Status List Tokens"
+        }
+    }
 
     private suspend fun verifySignature(unverifiedCwt: ByteArray, verificationTime: Instant) {
         verifyCwtSignature(unverifiedCwt, verificationTime)
@@ -172,4 +191,11 @@ internal class GetStatusListTokenUsingCwt(
     internal data class ProtectedHeader(
         @CborLabel(16) val type: String? = null,
     )
+
+    private companion object {
+        /**
+         * Initial byte of a CBOR tag (major type 6) whose number follows in one byte (tags 24..255)
+         */
+        const val CBOR_ONE_BYTE_TAG: Byte = 0xD8.toByte()
+    }
 }
